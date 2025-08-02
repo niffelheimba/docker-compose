@@ -1,0 +1,30 @@
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    env_file: stack.env
+    restart: always
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    networks:
+      - linkwarden_network
+  linkwarden:
+    env_file: stack.env
+    environment:
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
+    restart: always
+    # build: . # uncomment this line to build from source
+    image: ghcr.io/linkwarden/linkwarden:latest # comment this line to build from source
+    ports:
+      - 3060:3000
+    volumes:
+      - ./data:/data/data
+    depends_on:
+      - postgres
+    networks:
+      - linkwarden_network
+networks:
+  linkwarden_network:
+      external: true
+
+
