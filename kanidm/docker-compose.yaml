@@ -1,0 +1,25 @@
+services:
+  kanidm:
+    image: kanidm/server:latest
+    container_name: kanidm
+    restart: unless-stopped
+    ports:
+      - "8443:8443"
+    volumes:
+      - data:/data
+    environment:
+      - PUID=1000
+      - PGID=1000
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    user: "1000:1000"     # run as non-root
+    networks:
+      kanidm-net:
+
+networks:
+  kanidm-net:
+    external: true
+volumes:
+  data:

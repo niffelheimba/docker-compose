@@ -1,0 +1,40 @@
+services:
+  server:
+    image: ghcr.io/bluewave-labs/checkmate-backend-mono-multiarch:latest
+    restart: always
+    ports:
+      - "52345:52345"
+    environment:
+      - UPTIME_APP_API_BASE_URL=https://status.northlake.dev/api/v1
+      - UPTIME_APP_CLIENT_HOST=http://status.northlake.dev
+      - DB_CONNECTION_STRING=mongodb://mongodb:27017/uptime_db
+      - REDIS_URL=redis://redis:6379
+      - CLIENT_HOST=http://status.northlake.dev
+      - JWT_SECRET='kjhdsghgjKDKSDFLLjfgotiMkjrqIOPMCfkkkdFFDShSQAsh'
+    depends_on:
+      - mongodb
+    networks:
+      checkmate-net:
+  mongodb:
+    image: mongo:4.4.18
+    container_name: checkmate-mongodb
+    restart: always
+    command: ["mongod", "--bind_ip_all"]
+#    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo/data:/data/db
+    networks:
+      checkmate-net:
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.runCommand({ ping: 1 })", "--quiet"]
+      interval: 5s
+      timeout: 30s
+      start_period: 0s
+      start_interval: 1s
+      retries: 30
+
+networks:
+  checkmate-net:
+    external: true

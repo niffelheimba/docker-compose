@@ -1,0 +1,31 @@
+services:
+  caddy:
+    image: caddy:alpine
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./conf:/etc/caddy
+      - ./site:/srv
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      caddy-net:
+      checkmate-net:
+      kanidm-net:
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+   caddy-net:
+    external: true
+   checkmate-net:
+    external: true
+   kanidm-net:
+    external: true
