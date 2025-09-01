@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     stop_grace_period: 30s # allow enough time to shut down the various services
     image: ghcr.io/blakeblackshear/frigate:stable
-    shm_size: "512mb" # update for your cameras based on calculation above
+    shm_size: "768mb" # update for your cameras based on calculation above
 
 #    devices:
 #      - /dev/bus/usb:/dev/bus/usb # Passes the USB Coral, needs to be modified for other versions
@@ -20,7 +20,7 @@ services:
       - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
         target: /tmp/cache
         tmpfs:
-          size: 1000000000
+          size: 3000000000
     ports:
       - "8971:8971" #UI port, remember publishing ports bypasses ufw firewall
       # - "5000:5000" # Internal unauthenticated access. Expose carefully.
@@ -28,8 +28,12 @@ services:
       - "8555:8555/tcp" # WebRTC over tcp
       - "8555:8555/udp" # WebRTC over udp
       - "1984:1984" #go2rtc
-    env_file:
-      - stack.env
+    mem_limit: 8g
+    security_opt:
+      - no-new-privileges:true
+      
+#    env_file:
+#      - stack.env
 volumes:
   frigate:
     driver: local
