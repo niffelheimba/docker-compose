@@ -2,8 +2,9 @@ services:
   caddy:
     image: caddy:alpine
     restart: unless-stopped
-    cap_add:
-      - NET_ADMIN
+#    user: "1003:1003"
+#    cap_add:
+#     - NET_ADMIN
     ports:
       - "80:80"
       - "443:443"
@@ -11,21 +12,27 @@ services:
     volumes:
       - ./conf:/etc/caddy
       - ./site:/srv
-      - caddy_data:/data
+      - ./data:/data #caddy_data:/data
       - caddy_config:/config
     networks:
       caddy-net:
-      checkmate-net:
+      uptime-net:
       kanidm-net:
+      vaultwarden-net:
+      arcane-net:
 
 volumes:
-  caddy_data:
+#  caddy_data:
   caddy_config:
 
 networks:
-   caddy-net:
+  caddy-net:
     external: true
-   checkmate-net:
+  uptime-net:
     external: true
-   kanidm-net:
+  kanidm-net:
+    external: true
+  vaultwarden-net:
+    external: true
+  arcane-net:
     external: true

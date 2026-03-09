@@ -5,21 +5,26 @@ services:
     restart: unless-stopped
     ports:
       - "8443:8443"
+    user: "1003:1003"
+    env_file:
+      - .env
+#    security_opt:
+#      - no-new-privileges:true
+#    cap_drop:
+#       - ALL
     volumes:
       - data:/data
-    environment:
-      - PUID=1000
-      - PGID=1000
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    user: "1000:1000"     # run as non-root
+      - /home/docker-secure/certs:/certs:ro
+      - /home/docker-secure/docker-compose/kanidm/app_logos:/app_logos:ro
+      - /home/docker-secure/docker-compose/kanidm/override.css:/hpkg/override.css:ro
+#      - /home/docker-secure/docker-compose/caddy/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/idm.northlake.dev/idm.northlake.dev.crt:/data/idm.northlake.dev.crt:ro
+#      - /home/docker-secure/docker-compose/caddy/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/idm.northlake.dev/idm.northlake.dev.key:/data/idm.northlake.dev.key:ro
     networks:
-      kanidm-net:
+      - kanidm-net
 
 networks:
   kanidm-net:
     external: true
+
 volumes:
   data:

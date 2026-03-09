@@ -1,0 +1,28 @@
+services:
+  arcane:
+    image: ghcr.io/getarcaneapp/arcane:latest
+    container_name: arcane
+    ports:
+      - '3552:3552'
+    volumes:
+      - /run/user/1003/docker.sock:/var/run/docker.sock
+      - arcane-data:/app/data
+      - /home/docker-secure/docker-compose/:/app/data/projects
+      - /home/docker-secure/docker-compose/arcane/builds:/builds
+      - /home/docker-secure/docker-compose/arcane/backups:/backups
+    environment:
+      - APP_URL=https://arcane.northlake.dev
+      - PUID=1003
+      - PGID=1003
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - arcane-net
+    restart: unless-stopped
+
+volumes:
+  arcane-data:
+
+networks:
+  arcane-net:
+    external: true

@@ -1,0 +1,26 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+      - ./entrypoint.sh:/entrypoint.sh:ro
+      - ./hosts:/etc/hosts:ro
+    ports:
+      - "3001:3001"
+    networks:
+      uptime-net:
+    dns:
+      - 10.10.10.1      
+      - 1.1.1.1         
+      - 9.9.9.9         
+    cap_add:
+      - NET_ADMIN
+    entrypoint: /entrypoint.sh
+    command: 
+      - npm
+      - start
+
+networks:
+  uptime-net:
+    external: true
