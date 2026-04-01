@@ -13,10 +13,10 @@ services:
 #    cap_drop:
 #       - ALL
     volumes:
-      - data:/data
+      - ./volume/_data:/data
       - /home/docker-secure/certs:/certs:ro
-      - /home/docker-secure/docker-compose/kanidm/app_logos:/app_logos:ro
-      - /home/docker-secure/docker-compose/kanidm/override.css:/hpkg/override.css:ro
+      - /home/docker-secure/docker-compose/KanIDM/app_logos:/app_logos:ro
+      - /home/docker-secure/docker-compose/KanIDM/override.css:/hpkg/override.css:ro
 #      - /home/docker-secure/docker-compose/caddy/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/idm.northlake.dev/idm.northlake.dev.crt:/data/idm.northlake.dev.crt:ro
 #      - /home/docker-secure/docker-compose/caddy/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/idm.northlake.dev/idm.northlake.dev.key:/data/idm.northlake.dev.key:ro
     networks:
@@ -25,6 +25,3 @@ services:
 networks:
   kanidm-net:
     external: true
-
-volumes:
-  data:
