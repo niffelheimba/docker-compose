@@ -8,20 +8,22 @@ services:
     user: "1003:1003"
     env_file:
       - .env
+    volumes:
+      - kanidm_data:/data
+      - /home/docker-secure/certs:/certs:ro
+      - /home/docker-secure/docker-compose/KanIDM/app_logos:/app_logos:ro
+      - /home/docker-secure/docker-compose/KanIDM/override.css:/hpkg/override.css:ro
 #    security_opt:
 #      - no-new-privileges:true
 #    cap_drop:
 #       - ALL
-    volumes:
-      - ./volume/_data:/data
-      - /home/docker-secure/certs:/certs:ro
-      - /home/docker-secure/docker-compose/KanIDM/app_logos:/app_logos:ro
-      - /home/docker-secure/docker-compose/KanIDM/override.css:/hpkg/override.css:ro
-#      - /home/docker-secure/docker-compose/caddy/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/idm.northlake.dev/idm.northlake.dev.crt:/data/idm.northlake.dev.crt:ro
-#      - /home/docker-secure/docker-compose/caddy/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/idm.northlake.dev/idm.northlake.dev.key:/data/idm.northlake.dev.key:ro
     networks:
       - kanidm-net
 
 networks:
   kanidm-net:
+    external: true
+
+volumes:
+  kanidm_data:
     external: true
