@@ -4,7 +4,7 @@ services:
     privileged: true # this may not be necessary for all setups
     restart: unless-stopped
     stop_grace_period: 30s # allow enough time to shut down the various services
-    image: ghcr.io/blakeblackshear/frigate:stable
+    image: ghcr.io/blakeblackshear/frigate:0.17.0-beta2
     shm_size: "768mb" # update for your cameras based on calculation above
 
 #    devices:
@@ -15,8 +15,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/Frigate/config:/config
-# use this if using direct fstab      - /mnt/Frigate:/media/frigate
-      - frigate:/media/frigate
+      - /mnt/Frigate:/media/frigate
       - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
         target: /tmp/cache
         tmpfs:
@@ -34,10 +33,4 @@ services:
       
 #    env_file:
 #      - stack.env
-volumes:
-  frigate:
-    driver: local
-    driver_opts:
-        type: "nfs4"
-        o: "addr=192.168.110.250,nolock,hard,rw"
-        device: ":/mnt/NAS1/NFS/Frigate"
+
