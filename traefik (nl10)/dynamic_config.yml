@@ -1,0 +1,82 @@
+http:
+  routers:
+    karakeep:
+      rule: Host(`karakeep.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: karakeep
+      tls:
+        certResolver: letsencrypt
+    frigate:
+      rule: Host(`frigate.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: frigate
+      tls:
+        certResolver: letsencrypt
+    homeassistant:
+      rule: Host(`homeassistant.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: homeassistant
+      tls:
+        certResolver: letsencrypt
+    pve2:
+      rule: Host(`pve2.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: pve2
+      middlewares:
+        - private-net
+      tls:
+        certResolver: letsencrypt
+    picpeak:
+      rule: Host(`picpeak.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: picpeak
+      tls:
+        certResolver: letsencrypt
+    amp:
+      rule: Host(`amp.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: amp
+      middlewares:
+        - private-net
+      tls:
+        certResolver: letsencrypt
+  middlewares:
+    private-net:
+      ipAllowList:
+        sourceRange:
+          - 10.0.0.0/8
+  services:
+    karakeep:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.200:3400
+    frigate:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.200:8971
+    homeassistant:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.155:9999
+    pve2:
+      loadBalancer:
+        servers:
+          - url: https://10.10.70.200:8006
+        serversTransport: pve2-transport
+    picpeak:
+      loadBalancer:
+        servers:
+          - url: http://10.10.50.253:3000
+    amp:
+      loadBalancer:
+        servers:
+          - url: http://10.10.50.50:8080
+  serversTransports:
+    pve2-transport:
+      insecureSkipVerify: true
