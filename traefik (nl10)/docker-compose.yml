@@ -26,7 +26,7 @@ services:
     volumes:
       - ./letsencrypt:/letsencrypt
       - ./logs:/var/log/traefik
-      - ./dynamic_config.yml:/etc/traefik/dynamic_config.yml:ro
+      - ./config/dynamic_config.yml:/etc/traefik/dynamic_config.yml:ro
     networks:
       - traefik-net
 
