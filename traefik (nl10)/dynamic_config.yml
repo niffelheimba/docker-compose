@@ -21,8 +21,17 @@ http:
       service: homeassistant
       tls:
         certResolver: letsencrypt
+    pve1:
+      rule: Host(`pve1.home.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: pve1
+      middlewares:
+        - private-net
+      tls:
+        certResolver: letsencrypt
     pve2:
-      rule: Host(`pve2.northlake.dev`)
+      rule: Host(`pve2.home.northlake.dev`)
       entryPoints:
         - websecure
       service: pve2
@@ -35,6 +44,20 @@ http:
       entryPoints:
         - websecure
       service: picpeak
+      tls:
+        certResolver: letsencrypt
+    nicholas_actualbudget:
+      rule: Host(`nicholas.actualbudget.home.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: nicholas_actualbudget
+      tls:
+        certResolver: letsencrypt
+    family_actualbudget:
+      rule: Host(`family.actualbudget.home.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: family_actualbudget
       tls:
         certResolver: letsencrypt
     amp:
@@ -51,6 +74,7 @@ http:
       ipAllowList:
         sourceRange:
           - 10.0.0.0/8
+          - 100.86.0.0/16
   services:
     karakeep:
       loadBalancer:
@@ -64,6 +88,11 @@ http:
       loadBalancer:
         servers:
           - url: http://10.10.60.155:9999
+    pve1:
+      loadBalancer:
+        servers:
+          - url: https://10.10.70.100:8006
+        serversTransport: pve1-transport
     pve2:
       loadBalancer:
         servers:
@@ -73,6 +102,14 @@ http:
       loadBalancer:
         servers:
           - url: http://10.10.50.253:3000
+    nicholas_actualbudget:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.200:5006
+    family_actualbudget:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.200:5007
     amp:
       loadBalancer:
         servers:
