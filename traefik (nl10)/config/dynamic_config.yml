@@ -79,7 +79,7 @@ http:
     karakeep:
       loadBalancer:
         servers:
-          - url: http://10.10.60.200:3400
+          - url: http://10.10.60.200:3000
     frigate:
       loadBalancer:
         servers:
