@@ -46,6 +46,13 @@ http:
       service: picpeak
       tls:
         certResolver: letsencrypt
+    kanidm:
+      rule: Host(`idm.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: kanidm
+      tls:
+        certResolver: letsencrypt
     nicholas_actualbudget:
       rule: Host(`nicholas.actualbudget.home.northlake.dev`)
       entryPoints:
@@ -79,7 +86,7 @@ http:
     karakeep:
       loadBalancer:
         servers:
-          - url: http://10.10.60.200:3400
+          - url: http://10.10.60.200:3000
     frigate:
       loadBalancer:
         servers:
@@ -102,6 +109,10 @@ http:
       loadBalancer:
         servers:
           - url: http://10.10.50.253:3000
+    kanidm:
+      loadBalancer:
+        servers:
+          - url: https://10.10.50.100:8443
     nicholas_actualbudget:
       loadBalancer:
         servers:

@@ -15,7 +15,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/Frigate/config:/config
-      - /mnt/Frigate:/media/frigate
+# use this if using direct fstab      - /mnt/Frigate:/media/frigate
+      - frigate:/media/frigate
       - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
         target: /tmp/cache
         tmpfs:
@@ -30,7 +31,13 @@ services:
     mem_limit: 8g
     security_opt:
       - no-new-privileges:true
-      
+
 #    env_file:
 #      - stack.env
-
+volumes:
+  frigate:
+    driver: local
+    driver_opts:
+        type: "nfs4"
+        o: "addr=10.10.60.250,nolock,hard,rw"
+        device: ":/mnt/NAS1/NFS/Frigate"
