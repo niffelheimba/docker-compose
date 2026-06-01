@@ -47,7 +47,7 @@ http:
       tls:
         certResolver: letsencrypt
     kanidm:
-      rule: Host(`home.idm.northlake.dev`)
+      rule: Host(`idm.northlake.dev`)
       entryPoints:
         - websecure
       service: kanidm
