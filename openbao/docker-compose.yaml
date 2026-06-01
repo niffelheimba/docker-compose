@@ -1,0 +1,38 @@
+services:
+  openbao:
+    image: docker.io/openbao/openbao:latest
+    container_name: openbao
+    restart: unless-stopped
+
+    cap_add:
+      - IPC_LOCK
+
+    command: server
+
+    ports:
+      - "8200:8200"
+
+    environment:
+      BAO_LOCAL_CONFIG: |
+        ui = true
+
+        storage "file" {
+          path = "/openbao/data"
+        }
+
+        listener "tcp" {
+          address     = "0.0.0.0:8200"
+          tls_disable = 1
+        }
+
+        api_addr     = "https://vault.cloud.northlake.dev"
+        cluster_addr = "http://127.0.0.1:8201"
+
+    volumes:
+      - ./data:/openbao/data
+
+    healthcheck:
+      test: ["CMD", "bao", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
