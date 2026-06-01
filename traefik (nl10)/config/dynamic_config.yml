@@ -112,7 +112,7 @@ http:
     kanidm:
       loadBalancer:
         servers:
-          - url: https:/10.10.50.100:8443
+          - url: https://10.10.50.100:8443
     nicholas_actualbudget:
       loadBalancer:
         servers:
