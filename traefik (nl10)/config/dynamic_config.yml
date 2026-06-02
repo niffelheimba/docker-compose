@@ -1,5 +1,5 @@
 http:
-  routers:
+  routers: ################################################
     karakeep:
       rule: Host(`karakeep.northlake.dev`)
       entryPoints:
@@ -76,13 +76,13 @@ http:
         - private-net
       tls:
         certResolver: letsencrypt
-  middlewares:
+  middlewares: ################################################
     private-net:
       ipAllowList:
         sourceRange:
           - 10.0.0.0/8
           - 100.86.0.0/16
-  services:
+  services: ################################################
     karakeep:
       loadBalancer:
         servers:
@@ -113,6 +113,7 @@ http:
       loadBalancer:
         servers:
           - url: https://10.10.50.100:8443
+        serversTransport: kanidm-transport
     nicholas_actualbudget:
       loadBalancer:
         servers:
@@ -125,6 +126,10 @@ http:
       loadBalancer:
         servers:
           - url: http://10.10.50.50:8080
-  serversTransports:
+  serversTransports: ################################################
+    pve1-transport:
+      insecureSkipVerify: true
     pve2-transport:
+      insecureSkipVerify: true
+    kanidm-transport:
       insecureSkipVerify: true
