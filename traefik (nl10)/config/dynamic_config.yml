@@ -8,7 +8,7 @@ http:
       tls:
         certResolver: letsencrypt
     frigate:
-      rule: Host(`frigate.northlake.dev`)
+      rule: Host(`frigate.northlake.dev`,`frigate.home.northlake.dev`)
       entryPoints:
         - websecure
       service: frigate
