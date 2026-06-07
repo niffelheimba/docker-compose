@@ -28,8 +28,6 @@ services:
       - /home/service/docker-state/traefik/logs:/var/log/traefik #./logs:/var/log/traefik
       - ./config/dynamic_config.yml:/etc/traefik/dynamic_config.yml:ro
 
-      volumes:
-  - ./config/dynamic_config.yml:/etc/traefik/dynamic_config.yml:ro
     networks:
       - traefik-net
 
