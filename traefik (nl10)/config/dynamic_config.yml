@@ -7,10 +7,17 @@ http:
       service: karakeep
       tls:
         certResolver: letsencrypt
-    frigate:
-      rule: Host(`frigate.northlake.dev`,`frigate.home.northlake.dev`)
+    frigate_home:
+      rule: Host(`frigate.home.northlake.dev`)
       entryPoints:
         - websecure
+      service: frigate
+      tls:
+        certResolver: letsencrypt
+    frigate_legacy:
+      rule: Host(`frigate.northlake.dev`)
+      entryPoints:
+          - websecure
       service: frigate
       tls:
         certResolver: letsencrypt
