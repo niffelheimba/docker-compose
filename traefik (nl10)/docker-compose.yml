@@ -24,9 +24,12 @@ services:
       - --log.level=info
       - --log.format=common
     volumes:
-      - ./letsencrypt:/letsencrypt
-      - ./logs:/var/log/traefik
+      - /home/service/docker-state/traefik/letsencrypt:/letsencrypt #./letsencrypt:/letsencrypt
+      - /home/service/docker-state/traefik/logs:/var/log/traefik #./logs:/var/log/traefik
       - ./config/dynamic_config.yml:/etc/traefik/dynamic_config.yml:ro
+
+      volumes:
+  - ./config/dynamic_config.yml:/etc/traefik/dynamic_config.yml:ro
     networks:
       - traefik-net
 
