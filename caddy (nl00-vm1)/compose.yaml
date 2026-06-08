@@ -14,6 +14,7 @@ services:
       - ./site:/srv
       - ./data:/data #caddy_data:/data
       - caddy_config:/config
+      - /home/docker-secure/docker-compose/KanIDM/internal-certs/traefik/northlake-kanidm-internal-ca.crt:/etc/ssl/certs/northlake-kanidm-internal-ca.crt:ro
     networks:
       caddy-net:
       uptime-net:
