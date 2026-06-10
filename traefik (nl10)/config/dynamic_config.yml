@@ -7,20 +7,45 @@ http:
       service: karakeep
       tls:
         certResolver: letsencrypt
+
+    # NEW TEST ROUTE:
+    # This hostname goes through oauth2-proxy before reaching Frigate.
     frigate_home:
       rule: Host(`frigate.home.northlake.dev`)
       entryPoints:
         - websecure
       service: frigate
+      middlewares:
+        - frigate-oauth-errors
+        - frigate-oauth-auth
+        - frigate-proxy-headers
       tls:
         certResolver: letsencrypt
+
+    # REQUIRED:
+    # This exposes oauth2-proxy's /oauth2/* endpoints on the same hostname.
+    # Your KanIDM redirect URI should be:
+    # https://frigate.home.northlake.dev/oauth2/callback
+    frigate_home_oauth2:
+      rule: Host(`frigate.home.northlake.dev`) && PathPrefix(`/oauth2/`)
+      entryPoints:
+        - websecure
+      service: oauth2-proxy
+      middlewares:
+        - auth-headers
+      tls:
+        certResolver: letsencrypt
+
+    # LEGACY / NORMAL ROUTE:
+    # This hostname still goes directly to Frigate with no oauth2-proxy.
     frigate_legacy:
       rule: Host(`frigate.northlake.dev`)
       entryPoints:
-          - websecure
+        - websecure
       service: frigate
       tls:
         certResolver: letsencrypt
+
     homeassistant:
       rule: Host(`homeassistant.northlake.dev`)
       entryPoints:
@@ -28,6 +53,7 @@ http:
       service: homeassistant
       tls:
         certResolver: letsencrypt
+
     pve1:
       rule: Host(`pve1.home.northlake.dev`)
       entryPoints:
@@ -37,6 +63,7 @@ http:
         - private-net
       tls:
         certResolver: letsencrypt
+
     pve2:
       rule: Host(`pve2.home.northlake.dev`)
       entryPoints:
@@ -46,6 +73,7 @@ http:
         - private-net
       tls:
         certResolver: letsencrypt
+
     picpeak:
       rule: Host(`picpeak.northlake.dev`)
       entryPoints:
@@ -53,6 +81,7 @@ http:
       service: picpeak
       tls:
         certResolver: letsencrypt
+
     kanidm:
       rule: Host(`idm.northlake.dev`)
       entryPoints:
@@ -60,6 +89,7 @@ http:
       service: kanidm
       tls:
         certResolver: letsencrypt
+
     nicholas_actualbudget:
       rule: Host(`nicholas.actualbudget.home.northlake.dev`)
       entryPoints:
@@ -67,6 +97,7 @@ http:
       service: nicholas_actualbudget
       tls:
         certResolver: letsencrypt
+
     family_actualbudget:
       rule: Host(`family.actualbudget.home.northlake.dev`)
       entryPoints:
@@ -74,6 +105,7 @@ http:
       service: family_actualbudget
       tls:
         certResolver: letsencrypt
+
     amp:
       rule: Host(`amp.northlake.dev`)
       entryPoints:
@@ -83,60 +115,125 @@ http:
         - private-net
       tls:
         certResolver: letsencrypt
+
   middlewares: ################################################
     private-net:
       ipAllowList:
         sourceRange:
           - 10.0.0.0/8
           - 100.86.0.0/16
+
+    # Traefik asks oauth2-proxy whether the request is authenticated.
+    # oauth2-proxy should return 202 if valid, 401 if not.
+    frigate-oauth-auth:
+      forwardAuth:
+        address: http://10.10.60.200:4180/oauth2/auth
+        trustForwardHeader: true
+        authResponseHeaders:
+          - X-Auth-Request-User
+          - X-Auth-Request-Email
+          - X-Auth-Request-Groups
+          - X-Auth-Request-Access-Token
+          - Authorization
+
+    # If oauth2-proxy returns 401/403, send the browser to the oauth2-proxy sign-in endpoint.
+    # statusRewrites makes the browser follow the redirect as a real 302 instead of showing "Found."
+    frigate-oauth-errors:
+      errors:
+        status:
+          - "401-403"
+        service: oauth2-proxy
+        query: "/oauth2/sign_in?rd={url}"
+        statusRewrites:
+          "401": 302
+
+    # Secret header that Frigate can use to trust this reverse-proxy path.
+    # Replace this with a long random value and match it in Frigate's config.
+    frigate-proxy-headers:
+      headers:
+        customRequestHeaders:
+          X-Proxy-Secret: "REPLACE_WITH_LONG_RANDOM_SECRET"
+
+    # Optional hardening headers from oauth2-proxy's Traefik example.
+    # I removed sslHost/example.com because it does not fit your domain layout.
+    auth-headers:
+      headers:
+        sslRedirect: true
+        stsSeconds: 315360000
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        frameDeny: true
+
   services: ################################################
     karakeep:
       loadBalancer:
         servers:
           - url: http://10.10.60.200:3000
+
     frigate:
       loadBalancer:
         servers:
           - url: http://10.10.60.200:8971
+
+    # oauth2-proxy itself, not Frigate.
+    # Assumes oauth2-proxy is listening on 10.10.60.200:4180.
+    oauth2-proxy:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.200:4180
+
     homeassistant:
       loadBalancer:
         servers:
           - url: http://10.10.60.155:9999
+
     pve1:
       loadBalancer:
         servers:
           - url: https://10.10.70.100:8006
         serversTransport: pve1-transport
+
     pve2:
       loadBalancer:
         servers:
           - url: https://10.10.70.200:8006
         serversTransport: pve2-transport
+
     picpeak:
       loadBalancer:
         servers:
           - url: http://10.10.50.253:3000
+
     kanidm:
       loadBalancer:
         servers:
           - url: https://10.10.50.100:8443
         serversTransport: kanidm-transport
+
     nicholas_actualbudget:
       loadBalancer:
         servers:
           - url: http://10.10.60.200:5006
+
     family_actualbudget:
       loadBalancer:
         servers:
           - url: http://10.10.60.200:5007
+
     amp:
       loadBalancer:
         servers:
           - url: http://10.10.50.50:8080
+
   serversTransports: ################################################
     pve1-transport:
       insecureSkipVerify: true
+
     pve2-transport:
       insecureSkipVerify: true
+
     kanidm-transport:
       insecureSkipVerify: true
