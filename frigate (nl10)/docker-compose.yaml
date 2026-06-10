@@ -4,7 +4,7 @@ services:
     privileged: true # this may not be necessary for all setups
     restart: unless-stopped
     stop_grace_period: 30s # allow enough time to shut down the various services
-    image: ghcr.io/blakeblackshear/frigate:0.17.0-beta2
+    image: ghcr.io/blakeblackshear/frigate:0.17.1
     shm_size: "768mb" # update for your cameras based on calculation above
 
 #    devices:
