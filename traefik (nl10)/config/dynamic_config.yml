@@ -8,7 +8,7 @@ http:
       tls:
         certResolver: letsencrypt
 
-    # NEW TEST ROUTE:
+    # TEST ROUTE:
     # This hostname goes through oauth2-proxy before reaching Frigate.
     frigate_home:
       rule: Host(`frigate.home.northlake.dev`)
@@ -18,13 +18,13 @@ http:
       middlewares:
         - frigate-oauth-errors
         - frigate-oauth-auth
-        - frigate-proxy-headers
+        - frigate-proxy-secret
       tls:
         certResolver: letsencrypt
 
     # REQUIRED:
     # This exposes oauth2-proxy's /oauth2/* endpoints on the same hostname.
-    # Your KanIDM redirect URI should be:
+    # KanIDM redirect URI:
     # https://frigate.home.northlake.dev/oauth2/callback
     frigate_home_oauth2:
       rule: Host(`frigate.home.northlake.dev`) && PathPrefix(`/oauth2/`)
@@ -124,7 +124,7 @@ http:
           - 100.86.0.0/16
 
     # Traefik asks oauth2-proxy whether the request is authenticated.
-    # oauth2-proxy should return 202 if valid, 401 if not.
+    # oauth2-proxy returns 202 if valid, 401 if not.
     frigate-oauth-auth:
       forwardAuth:
         address: http://10.10.60.200:4180/oauth2/auth
@@ -136,8 +136,7 @@ http:
           - X-Auth-Request-Access-Token
           - Authorization
 
-    # If oauth2-proxy returns 401/403, send the browser to the oauth2-proxy sign-in endpoint.
-    # statusRewrites makes the browser follow the redirect as a real 302 instead of showing "Found."
+    # If oauth2-proxy returns 401/403, send browser to oauth2-proxy sign-in.
     frigate-oauth-errors:
       errors:
         status:
@@ -147,15 +146,13 @@ http:
         statusRewrites:
           "401": 302
 
-    # Secret header that Frigate can use to trust this reverse-proxy path.
-    # Replace this with a long random value and match it in Frigate's config.
-    frigate-proxy-headers:
-      headers:
-        customRequestHeaders:
-          X-Proxy-Secret: "REPLACE_WITH_LONG_RANDOM_SECRET"
+    # Defined in config/.dynamic_secrets.local.yml, not here:
+    #
+    # frigate-proxy-secret:
+    #   headers:
+    #     customRequestHeaders:
+    #       X-Proxy-Secret: "SECRET_VALUE"
 
-    # Optional hardening headers from oauth2-proxy's Traefik example.
-    # I removed sslHost/example.com because it does not fit your domain layout.
     auth-headers:
       headers:
         sslRedirect: true

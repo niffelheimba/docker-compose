@@ -16,35 +16,32 @@ services:
       - --entryPoints.web.http.redirections.entryPoint.to=websecure
       - --entryPoints.web.http.redirections.entryPoint.scheme=https
       - --entryPoints.websecure.http.tls.certResolver=letsencrypt
+
       - --providers.docker=false
-      - --providers.file.filename=/etc/traefik/dynamic_config.yml
+
+      # Changed from single-file provider to directory provider.
+      # This lets Traefik load both:
+      #   /etc/traefik/dynamic/dynamic_config.yml
+      #   /etc/traefik/dynamic/.dynamic_secrets.local.yml
+      - --providers.file.directory=/etc/traefik/dynamic
+      - --providers.file.watch=true
+
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
       - --certificatesresolvers.letsencrypt.acme.email=nd.personal@icloud.com
       - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+
       - --log.level=info
       - --log.format=common
+
     volumes:
-      - /home/service/docker-state/traefik/letsencrypt:/letsencrypt #./letsencrypt:/letsencrypt
-      - /home/service/docker-state/traefik/logs:/var/log/traefik #./logs:/var/log/traefik
-      - ./config/dynamic_config.yml:/etc/traefik/dynamic_config.yml:ro
+      - /home/service/docker-state/traefik/letsencrypt:/letsencrypt
+      - /home/service/docker-state/traefik/logs:/var/log/traefik
+
+      # Changed from mounting one file to mounting the whole config directory.
+      - ./config:/etc/traefik/dynamic:ro
 
     networks:
       - traefik-net
-
-  # Template for adding a new public container route:
-  # my-service:
-  #   image: alpine:3.18
-  #   command: ["sh", "-c", "sleep infinity"]
-  #   restart: unless-stopped
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.routers.my-service.rule=Host(`my.domain.dev`) && PathPrefix(`/path`)
-  #     - traefik.http.routers.my-service.entrypoints=websecure
-  #     - traefik.http.routers.my-service.tls=true
-  #     - traefik.http.routers.my-service.tls.certresolver=letsencrypt
-  #     - traefik.http.services.my-service.loadbalancer.server.url=http://10.10.60.200:1234
-  #   networks:
-  #     - traefik-net
 
 networks:
   traefik-net:
