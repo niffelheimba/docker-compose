@@ -11,4 +11,4 @@ services:
 networks:
   traefik-net:
     external: true
-    name: traefik-net
+    name: nl10-traefik_traefik-net
