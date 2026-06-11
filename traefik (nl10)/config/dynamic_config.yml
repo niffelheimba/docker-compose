@@ -127,7 +127,7 @@ http:
     # oauth2-proxy returns 202 if valid, 401 if not.
     frigate-oauth-auth:
       forwardAuth:
-        address: http://10.10.60.200:4180/oauth2/auth
+        address: http://frigate-oauth2-proxy:4180/oauth2/auth
         trustForwardHeader: true
         authResponseHeaders:
           - X-Auth-Request-User
@@ -180,7 +180,7 @@ http:
     oauth2-proxy:
       loadBalancer:
         servers:
-          - url: http://10.10.60.200:4180
+          - url: http://frigate-oauth2-proxy:4180
 
     homeassistant:
       loadBalancer:
