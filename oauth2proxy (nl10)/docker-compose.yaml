@@ -7,6 +7,9 @@ services:
       - .env
     ports:
       - "4180:4180"
+    networks:
+      - default
+      - traefik-net
 
 networks:
   traefik-net:
