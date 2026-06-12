@@ -146,8 +146,8 @@ http:
 
     frigate-redirect-to-home:
       redirectRegex:
-        regex: "^https?://frigate\\.northlake\\.dev(.*)"
-        replacement: "https://frigate.home.northlake.dev$1"
+        regex: '^https?://frigate\.northlake\.dev(?:/.*)?$'
+        replacement: 'https://frigate.home.northlake.dev'
         permanent: true
 
     # Defined in config/.dynamic_secrets.local.yml, not here:
