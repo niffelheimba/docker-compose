@@ -10,6 +10,13 @@ services:
     networks:
       - default
       - traefik-net
+  redis:
+    image: redis:7-alpine
+    container_name: frigate-oauth2-redis
+    restart: unless-stopped
+    networks:
+      - default
+      - traefik-net
 
 networks:
   traefik-net:
