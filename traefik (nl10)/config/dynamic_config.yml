@@ -8,10 +8,20 @@ http:
       tls:
         certResolver: letsencrypt
 
-    # Frigate should use oauth2-proxy on both hostnames.
-    # This routes user traffic to Frigate only after oauth2-proxy authentication.
+    # Redirect the legacy Frigate hostname to the OAuth-protected host.
+    frigate_redirect:
+      rule: Host(`frigate.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: frigate
+      middlewares:
+        - frigate-redirect-to-home
+      tls:
+        certResolver: letsencrypt
+
+    # Frigate should use oauth2-proxy on the canonical hostname.
     frigate:
-      rule: Host(`frigate.home.northlake.dev`) || Host(`frigate.northlake.dev`)
+      rule: Host(`frigate.home.northlake.dev`)
       entryPoints:
         - websecure
       service: frigate
@@ -23,12 +33,11 @@ http:
         certResolver: letsencrypt
 
     # REQUIRED:
-    # This exposes oauth2-proxy's /oauth2/* endpoints on both hostnames.
-    # KanIDM redirect URI examples:
+    # This exposes oauth2-proxy's /oauth2/* endpoints on the canonical hostname.
+    # KanIDM redirect URI example:
     #   https://frigate.home.northlake.dev/oauth2/callback
-    #   https://frigate.northlake.dev/oauth2/callback
     frigate_oauth2:
-      rule: (Host(`frigate.home.northlake.dev`) || Host(`frigate.northlake.dev`)) && PathPrefix(`/oauth2/`)
+      rule: Host(`frigate.home.northlake.dev`) && PathPrefix(`/oauth2/`)
       entryPoints:
         - websecure
       service: oauth2-proxy
@@ -134,6 +143,12 @@ http:
         query: "/oauth2/sign_in?rd={url}"
         statusRewrites:
           "401": 302
+
+    frigate-redirect-to-home:
+      redirectRegex:
+        regex: "^https?://frigate\\.northlake\\.dev(.*)"
+        replacement: "https://frigate.home.northlake.dev$$1"
+        permanent: true
 
     # Defined in config/.dynamic_secrets.local.yml, not here:
     #
