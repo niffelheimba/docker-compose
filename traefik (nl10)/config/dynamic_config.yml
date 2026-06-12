@@ -8,10 +8,10 @@ http:
       tls:
         certResolver: letsencrypt
 
-    # TEST ROUTE:
-    # This hostname goes through oauth2-proxy before reaching Frigate.
-    frigate_home:
-      rule: Host(`frigate.home.northlake.dev`)
+    # Frigate should use oauth2-proxy on both hostnames.
+    # This routes user traffic to Frigate only after oauth2-proxy authentication.
+    frigate:
+      rule: Host(`frigate.home.northlake.dev`) || Host(`frigate.northlake.dev`)
       entryPoints:
         - websecure
       service: frigate
@@ -23,26 +23,17 @@ http:
         certResolver: letsencrypt
 
     # REQUIRED:
-    # This exposes oauth2-proxy's /oauth2/* endpoints on the same hostname.
-    # KanIDM redirect URI:
-    # https://frigate.home.northlake.dev/oauth2/callback
-    frigate_home_oauth2:
-      rule: Host(`frigate.home.northlake.dev`) && PathPrefix(`/oauth2/`)
+    # This exposes oauth2-proxy's /oauth2/* endpoints on both hostnames.
+    # KanIDM redirect URI examples:
+    #   https://frigate.home.northlake.dev/oauth2/callback
+    #   https://frigate.northlake.dev/oauth2/callback
+    frigate_oauth2:
+      rule: (Host(`frigate.home.northlake.dev`) || Host(`frigate.northlake.dev`)) && PathPrefix(`/oauth2/`)
       entryPoints:
         - websecure
       service: oauth2-proxy
       middlewares:
         - auth-headers
-      tls:
-        certResolver: letsencrypt
-
-    # LEGACY / NORMAL ROUTE:
-    # This hostname still goes directly to Frigate with no oauth2-proxy.
-    frigate_legacy:
-      rule: Host(`frigate.northlake.dev`)
-      entryPoints:
-        - websecure
-      service: frigate
       tls:
         certResolver: letsencrypt
 
