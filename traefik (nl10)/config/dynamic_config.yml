@@ -116,6 +116,16 @@ http:
       tls:
         certResolver: letsencrypt
 
+    jellyfin:
+      rule: Host(`stream.home.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: jellyfin
+      middlewares:
+        - private-net
+      tls:
+        certResolver: letsencrypt
+
   middlewares: ################################################
     private-net:
       ipAllowList:
@@ -228,6 +238,13 @@ http:
       loadBalancer:
         servers:
           - url: http://10.10.50.50:8080
+
+    jellyfin:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.6:8096
+
+
 
   serversTransports: ################################################
     pve1-transport:
