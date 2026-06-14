@@ -1,0 +1,32 @@
+services:
+  certdumper:
+    image: ghcr.io/kereis/traefik-certs-dumper:latest
+    container_name: kanidm-home-certdumper
+    command: --restart-containers kanidm-home
+    restart: unless-stopped
+    network_mode: none
+    volumes:
+      - /home/service/docker-state/traefik/letsencrypt:/traefik:ro
+      - ./certs:/output:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      DOMAIN: idm.northlake.dev
+      OVERRIDE_UID: "1000"
+      OVERRIDE_GID: "1000"
+
+  kanidmd:
+    image: docker.io/kanidm/server:1.10.3
+    container_name: kanidm-home
+    restart: unless-stopped
+    depends_on:
+      - certdumper
+    ports:
+      - "8443:8443"
+      - "8444:8444"
+      - "3636:3636"
+    extra_hosts:
+      - "idm.northlake.dev:10.0.0.154"
+    volumes:
+      - ./server.toml:/data/server.toml:ro
+      - ./data:/data
+      - ./certs:/certs:ro
