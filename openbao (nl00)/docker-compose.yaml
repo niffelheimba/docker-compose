@@ -25,7 +25,7 @@ services:
           tls_disable = 1
         }
 
-        api_addr     = "https://vault.cloud.northlake.dev"
+        api_addr     = "https://secrets.cloud.northlake.dev"
         cluster_addr = "http://127.0.0.1:8201"
 
     volumes:
