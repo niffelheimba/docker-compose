@@ -114,14 +114,6 @@ http:
       tls:
         certResolver: letsencrypt
 
-    openbao:
-      rule: Host(`secrets.home.northlake.dev`)
-      entryPoints:
-        - websecure
-      service: openbao
-      tls:
-        certResolver: letsencrypt
-
     amp:
       rule: Host(`amp.northlake.dev`)
       entryPoints:
@@ -252,11 +244,6 @@ http:
       loadBalancer:
         servers:
           - url: http://10.10.60.200:5008
-
-    openbao:
-      loadBalancer:
-        servers:
-          - url: http://10.10.50.100:8200
 
     amp:
       loadBalancer:
