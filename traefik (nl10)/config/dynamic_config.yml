@@ -74,6 +74,16 @@ http:
       tls:
         certResolver: letsencrypt
 
+    truenas:
+      rule: Host(`truenas.home.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: truenas
+      middlewares:
+        - private-net
+      tls:
+        certResolver: letsencrypt
+
     picpeak:
       rule: Host(`picpeak.northlake.dev`)
       entryPoints:
@@ -219,6 +229,12 @@ http:
           - url: https://10.10.70.200:8006
         serversTransport: pve2-transport
 
+    truenas:
+      loadBalancer:
+        servers:
+          - url: https://10.10.60.250
+        serversTransport: truenas-transport
+
     picpeak:
       loadBalancer:
         servers:
@@ -262,6 +278,9 @@ http:
       insecureSkipVerify: true
 
     pve2-transport:
+      insecureSkipVerify: true
+
+    truenas-transport:
       insecureSkipVerify: true
 
     kanidm-transport:
