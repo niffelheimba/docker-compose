@@ -1,26 +1,29 @@
 services:
   frigate:
     container_name: frigate
-    privileged: true # this may not be necessary for all setups
+    privileged: true
     restart: unless-stopped
-    stop_grace_period: 30s # allow enough time to shut down the various services
+    stop_grace_period: 30s
     image: ghcr.io/blakeblackshear/frigate:0.17.1
-    shm_size: "768mb" # update for your cameras based on calculation above
+    shm_size: "768mb"
 
-#    devices:
-#      - /dev/bus/usb:/dev/bus/usb # Passes the USB Coral, needs to be modified for other versions
-#      - /dev/apex_0:/dev/apex_0 # Passes a PCIe Coral, follow driver instructions here https://coral.ai/docs/m2/get-started/#2a-on-linux
-#      - /dev/video11:/dev/video11 # For Raspberry Pi 4B
-#      - /dev/dri/renderD128:/dev/dri/renderD128 # For intel hwaccel, needs to be updated for your hardware
+    entrypoint: >
+      sh -c 'sleep 90;
+      until [ -f /media/frigate/.nas-ready ]; do
+        echo "Waiting for NAS mount /media/frigate...";
+        sleep 10;
+      done;
+      exec /init'
+
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/Frigate/config:/config
-# use this if using direct fstab      - /mnt/Frigate:/media/frigate
-      - frigate:/media/frigate
-      - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
+      - /mnt/Frigate:/media/frigate
+      - type: tmpfs
         target: /tmp/cache
         tmpfs:
           size: 3000000000
+          
     ports:
       - "8971:8971" #UI port, remember publishing ports bypasses ufw firewall
       # - "5000:5000" # Internal unauthenticated access. Expose carefully.
