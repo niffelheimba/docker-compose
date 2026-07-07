@@ -74,6 +74,8 @@ http:
       tls:
         certResolver: letsencrypt
 
+    # TrueNAS is reachable only from approved networks and now also requires
+    # a client certificate trusted by the mTLS option attached below.
     truenas:
       rule: Host(`truenas.home.northlake.dev`)
       entryPoints:
@@ -83,6 +85,9 @@ http:
         - private-net
       tls:
         certResolver: letsencrypt
+        # ===== mTLS: TrueNAS client-certificate gate =====
+        # Require clients to present a certificate signed by the Northlake Identity Issuing CA.
+        options: truenas-client-mtls@file
 
     picpeak:
       rule: Host(`picpeak.northlake.dev`)
@@ -144,6 +149,7 @@ http:
 
   middlewares: ################################################
     private-net:
+      # Keep home-only services off the open internet even before app auth runs.
       ipAllowList:
         sourceRange:
           - 10.0.0.0/8
@@ -229,6 +235,9 @@ http:
           - url: https://10.10.70.200:8006
         serversTransport: pve2-transport
 
+    # TrueNAS uses HTTPS upstream with a local/self-signed certificate, so the
+    # matching serversTransport below disables upstream certificate validation.
+    # Client-facing TLS is still terminated by Traefik.
     truenas:
       loadBalancer:
         servers:
@@ -281,7 +290,23 @@ http:
       insecureSkipVerify: true
 
     truenas-transport:
+      # Upstream-only setting for the TrueNAS backend certificate.
+      # This is separate from client-certificate verification at Traefik.
       insecureSkipVerify: true
 
     kanidm-transport:
       insecureSkipVerify: true
+
+# ===== mTLS: certificate authorities and client-auth policies =====
+# This is intentionally outside the "http" tree. Traefik TLS options are
+# top-level dynamic config and can be attached per-router with tls.options.
+tls:
+  options:
+    truenas-client-mtls:
+      # Traefik still serves the public LetsEncrypt certificate for the hostname.
+      # This issuing CA is only used to verify client certificates presented by
+      # browsers, apps, or automation that connect to the TrueNAS router.
+      clientAuth:
+        clientAuthType: RequireAndVerifyClientCert
+        caFiles:
+          - /etc/traefik/dynamic/certs/northlake-identity-issuing-ca-01.crt.pem
