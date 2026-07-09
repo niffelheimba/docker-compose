@@ -83,6 +83,8 @@ http:
       service: truenas
       middlewares:
         - private-net
+        - truenas-client-cert-info
+        - truenas-revocation-check
       tls:
         certResolver: letsencrypt
         # ===== mTLS: TrueNAS client-certificate gate =====
@@ -154,6 +156,33 @@ http:
         sourceRange:
           - 10.0.0.0/8
           - 100.86.0.0/16
+
+    # ===== mTLS: TrueNAS certificate metadata for revocation =====
+    # Traefik has already verified the client certificate chain at the TLS layer.
+    # This middleware exposes only the selected cert fields needed by the
+    # revocation checker; it does not forward the full certificate PEM.
+    truenas-client-cert-info:
+      passTLSClientCert:
+        info:
+          serialNumber: true
+          notAfter: true
+          notBefore: true
+          subject:
+            commonName: true
+            organization: true
+            organizationalUnit: true
+          issuer:
+            commonName: true
+            organization: true
+            organizationalUnit: true
+
+    # ===== mTLS: TrueNAS OpenBao revocation gate =====
+    # Denies revoked or unknown OpenBao-issued client cert serials before the
+    # request reaches the TrueNAS backend.
+    truenas-revocation-check:
+      forwardAuth:
+        address: http://mtls-revocation-checker:8080/auth
+        trustForwardHeader: true
 
     # Traefik asks oauth2-proxy whether the request is authenticated.
     # oauth2-proxy returns 202 if valid, 401 if not.
@@ -306,7 +335,12 @@ tls:
       # Traefik still serves the public LetsEncrypt certificate for the hostname.
       # This issuing CA is only used to verify client certificates presented by
       # browsers, apps, or automation that connect to the TrueNAS router.
+      # TLS 1.2 is capped here because RSA-backed YubiKey PIV client auth can
+      # fail TLS 1.3 handshakes when the smart-card provider cannot produce the
+      # requested RSA-PSS client-certificate signature.
+      maxVersion: VersionTLS12
       clientAuth:
         clientAuthType: RequireAndVerifyClientCert
         caFiles:
           - /etc/traefik/dynamic/certs/northlake-identity-issuing-ca-01.crt.pem
+          - /etc/traefik/dynamic/certs/northlake-root-ca.crt.pem

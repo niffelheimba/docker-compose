@@ -43,6 +43,20 @@ services:
     networks:
       - traefik-net
 
+  mtls-revocation-checker:
+    image: python:3.13-alpine
+    container_name: mtls-revocation-checker
+    restart: unless-stopped
+    command: python /app/revocation_checker.py
+    environment:
+      OPENBAO_CERT_BASE_URL: https://secrets.cloud.northlake.dev/v1/pki_user_mtls/cert
+      CACHE_TTL_SECONDS: "30"
+      FAIL_CLOSED: "true"
+    volumes:
+      - ./revocation-checker:/app:ro
+    networks:
+      - traefik-net
+
 networks:
   traefik-net:
     driver: bridge
