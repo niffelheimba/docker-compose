@@ -170,11 +170,9 @@ http:
           subject:
             commonName: true
             organization: true
-            organizationalUnit: true
           issuer:
             commonName: true
             organization: true
-            organizationalUnit: true
 
     # ===== mTLS: TrueNAS OpenBao revocation gate =====
     # Denies revoked or unknown OpenBao-issued client cert serials before the
