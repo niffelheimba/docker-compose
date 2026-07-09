@@ -132,7 +132,7 @@ http:
         certResolver: letsencrypt
 
     amp:
-      rule: Host(`amp.northlake.dev`)
+      rule: Host(`amp.home.northlake.dev`)
       entryPoints:
         - websecure
       service: amp
@@ -262,7 +262,7 @@ http:
     pve2:
       loadBalancer:
         servers:
-          - url: https://10.10.70.200:8006
+          - url: https://10.10.70.100:8006
         serversTransport: pve2-transport
 
     # TrueNAS uses HTTPS upstream with a local/self-signed certificate, so the
