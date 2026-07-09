@@ -181,6 +181,9 @@ http:
       forwardAuth:
         address: http://mtls-revocation-checker:8080/auth
         trustForwardHeader: true
+        # The checker returns tiny JSON responses; cap the auth response body so
+        # Traefik cannot buffer an unbounded response from the auth service.
+        maxResponseBodySize: 8192
 
     # Traefik asks oauth2-proxy whether the request is authenticated.
     # oauth2-proxy returns 202 if valid, 401 if not.
