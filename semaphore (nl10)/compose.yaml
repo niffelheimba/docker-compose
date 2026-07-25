@@ -1,0 +1,12 @@
+services:
+  semaphore:
+    image: semaphoreui/semaphore:latest
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/var/lib/semaphore
+      - ./config:/etc/semaphore
+      - ./tmp:/tmp
+    restart: unless-stopped
