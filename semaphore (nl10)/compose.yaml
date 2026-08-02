@@ -17,14 +17,14 @@ services:
     hostname: mysql
     volumes:
       - semaphore-mysql:/var/lib/mysql
-    environment:
+    env_file:
       - .env
   semaphore:
     restart: unless-stopped
     ports:
       - 3000:3000
     image: semaphoreui/semaphore:latest
-    environment:
+    env_file:
       - .env
     depends_on:
       - mysql # for postgres, change to: postgres
