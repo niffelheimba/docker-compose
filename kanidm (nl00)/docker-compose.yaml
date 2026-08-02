@@ -1,6 +1,6 @@
 services:
   kanidm:
-    image: kanidm/server:latest
+    image: kanidm/server:1.11.0
     container_name: kanidm
     restart: unless-stopped
     ports:
