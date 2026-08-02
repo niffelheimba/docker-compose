@@ -18,10 +18,7 @@ services:
     volumes:
       - semaphore-mysql:/var/lib/mysql
     environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
-      MYSQL_DATABASE: semaphore
-      MYSQL_USER: semaphore
-      MYSQL_PASSWORD: semaphore
+      - .env
   semaphore:
     restart: unless-stopped
     ports:
