@@ -9,8 +9,8 @@ services:
 
     command: server
 
-    ports:
-      - "8200:8200"
+#    ports:
+#      - "8200:8200"
 
     environment:
       BAO_LOCAL_CONFIG: |
