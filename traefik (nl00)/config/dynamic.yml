@@ -1,0 +1,16 @@
+http:
+  middlewares:
+    private-net:
+      ipAllowList:
+        sourceRange:
+          - 10.0.0.0/8
+          - 100.86.0.0/16
+          - 172.16.0.0/12
+          - 192.168.0.0/16
+          - 127.0.0.1/32
+
+  serversTransports:
+    kanidm-internal:
+      serverName: idm.northlake.dev
+      rootCAs:
+        - /etc/traefik/dynamic/certs/northlake-kanidm-internal-ca.crt

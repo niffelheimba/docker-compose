@@ -1,0 +1,42 @@
+services:
+  mysql:
+    restart: unless-stopped
+    image: mysql:8.0
+    hostname: mysql
+    volumes:
+      - semaphore-mysql:/var/lib/mysql
+    env_file:
+      - .env
+    networks:
+      - default
+    labels:
+      traefik.enable: "false"
+
+  semaphore:
+    restart: unless-stopped
+    image: semaphoreui/semaphore:latest
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+    networks:
+      - default
+      - traefik-private
+    labels:
+      traefik.enable: "true"
+      northlake.traefik.scope: private
+      traefik.docker.network: traefik-private
+      traefik.http.routers.semaphore.rule: Host(`semaphore.cloud.northlake.dev`)
+      traefik.http.routers.semaphore.entrypoints: https
+      traefik.http.routers.semaphore.middlewares: private-net@file
+      traefik.http.routers.semaphore.tls.certresolver: letsencrypt
+      traefik.http.services.semaphore.loadbalancer.server.port: "3000"
+
+volumes:
+  semaphore-mysql:
+    name: semaphore_semaphore-mysql
+
+networks:
+  traefik-private:
+    name: traefik-private
+    external: true

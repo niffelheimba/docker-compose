@@ -8,11 +8,13 @@ services:
     volumes:
       - /home/service/docker-state/traefik/letsencrypt:/traefik:ro
       - ./certs:/output:rw
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${ROOTLESS_DOCKER_SOCKET:-/run/user/1000/docker.sock}:/var/run/docker.sock:ro
     environment:
       DOMAIN: idm.northlake.dev
       OVERRIDE_UID: "1000"
       OVERRIDE_GID: "1000"
+    labels:
+      traefik.enable: "false"
 
   kanidmd:
     image: docker.io/kanidm/server:1.10.3
@@ -21,7 +23,6 @@ services:
     depends_on:
       - certdumper
     ports:
-      - "8443:8443"
       - "8444:8444"
       - "3636:3636"
     extra_hosts:
@@ -30,3 +31,20 @@ services:
       - ./server.toml:/data/server.toml:ro
       - ./data:/data
       - ./certs:/certs:ro
+    networks:
+      - traefik-public
+    labels:
+      traefik.enable: "true"
+      northlake.traefik.scope: public
+      traefik.docker.network: traefik-public
+      traefik.http.routers.kanidm.rule: Host(`idm.northlake.dev`)
+      traefik.http.routers.kanidm.entrypoints: https
+      traefik.http.routers.kanidm.tls.certresolver: letsencrypt
+      traefik.http.services.kanidm.loadbalancer.server.port: "8443"
+      traefik.http.services.kanidm.loadbalancer.server.scheme: https
+      traefik.http.services.kanidm.loadbalancer.serverstransport: kanidm-public-cert@file
+
+networks:
+  traefik-public:
+    name: traefik-public
+    external: true

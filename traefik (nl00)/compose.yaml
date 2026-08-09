@@ -6,9 +6,9 @@ services:
     environment:
       CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
     ports:
-      - "${BIND_IP:-10.10.50.50}:80:80"
-      - "${BIND_IP:-10.10.50.50}:443:443"
-      - "${BIND_IP:-10.10.50.50}:443:443/udp"
+      - "${BIND_IP:-10.0.0.154}:80:80"
+      - "${BIND_IP:-10.0.0.154}:443:443"
+      - "${BIND_IP:-10.0.0.154}:443:443/udp"
     command:
       - --global.sendAnonymousUsage=false
       - --api.dashboard=false
@@ -32,29 +32,14 @@ services:
       - --accesslog.format=json
       - --accesslog.filepath=/var/log/traefik/access.log
     volumes:
-      - ${ROOTLESS_DOCKER_SOCKET:-/run/user/1000/docker.sock}:/var/run/docker.sock:ro
-      - /home/service/docker-state/traefik/letsencrypt:/letsencrypt
-      - /home/service/docker-state/traefik/logs:/var/log/traefik
+      - ${ROOTLESS_DOCKER_SOCKET:-/run/user/1003/docker.sock}:/var/run/docker.sock:ro
+      - /home/docker-secure/docker-state/traefik/letsencrypt:/letsencrypt
+      - /home/docker-secure/docker-state/traefik/logs:/var/log/traefik
       - ./config/dynamic.yml:/etc/traefik/dynamic/dynamic.yml:ro
       - ./config/certs:/etc/traefik/dynamic/certs:ro
+      - /home/docker-secure/docker-compose/KanIDM/internal-certs/traefik/northlake-kanidm-internal-ca.crt:/etc/traefik/dynamic/certs/northlake-kanidm-internal-ca.crt:ro
     networks:
       - traefik-public
-      - traefik-private
-    labels:
-      traefik.enable: "false"
-
-  mtls-revocation-checker:
-    image: python:3.13-alpine
-    container_name: mtls-revocation-checker
-    restart: unless-stopped
-    command: python /app/revocation_checker.py
-    environment:
-      OPENBAO_CERT_BASE_URL: https://secrets.cloud.northlake.dev/v1/pki_user_mtls/cert
-      CACHE_TTL_SECONDS: "30"
-      FAIL_CLOSED: "true"
-    volumes:
-      - ./revocation-checker:/app:ro
-    networks:
       - traefik-private
     labels:
       traefik.enable: "false"

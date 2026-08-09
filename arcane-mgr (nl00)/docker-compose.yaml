@@ -11,18 +11,28 @@ services:
       - /home/docker-secure/docker-compose/arcane/builds:/builds
       - /home/docker-secure/docker-compose/arcane/backups:/backups
     environment:
-      - APP_URL=https://arcane.northlake.dev
+      - APP_URL=https://arcane.cloud.northlake.dev
       - PUID=1003
       - PGID=1003
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - JWT_SECRET=${JWT_SECRET}
     networks:
-      - arcane-net
+      - traefik-private
     restart: unless-stopped
+    labels:
+      traefik.enable: "true"
+      northlake.traefik.scope: private
+      traefik.docker.network: traefik-private
+      traefik.http.routers.arcane.rule: Host(`arcane.cloud.northlake.dev`)
+      traefik.http.routers.arcane.entrypoints: https
+      traefik.http.routers.arcane.middlewares: private-net@file
+      traefik.http.routers.arcane.tls.certresolver: letsencrypt
+      traefik.http.services.arcane.loadbalancer.server.port: "3552"
 
 volumes:
   arcane-data:
 
 networks:
-  arcane-net:
+  traefik-private:
+    name: traefik-private
     external: true

@@ -1,0 +1,188 @@
+http:
+  routers:
+    homeassistant:
+      rule: Host(`homeassistant.northlake.dev`)
+      entryPoints:
+        - https
+      service: homeassistant
+      tls:
+        certResolver: letsencrypt
+
+    picpeak:
+      rule: Host(`picpeak.northlake.dev`)
+      entryPoints:
+        - https
+      service: picpeak
+      tls:
+        certResolver: letsencrypt
+
+    jellyfin:
+      rule: Host(`stream.home.northlake.dev`)
+      entryPoints:
+        - https
+      service: jellyfin
+      tls:
+        certResolver: letsencrypt
+
+    pve1:
+      rule: Host(`pve1.home.northlake.dev`)
+      entryPoints:
+        - https
+      service: pve1
+      middlewares:
+        - private-net
+      tls:
+        certResolver: letsencrypt
+
+    pve2:
+      rule: Host(`pve2.home.northlake.dev`)
+      entryPoints:
+        - https
+      service: pve2
+      middlewares:
+        - private-net
+      tls:
+        certResolver: letsencrypt
+
+    truenas:
+      rule: Host(`truenas.home.northlake.dev`)
+      entryPoints:
+        - https
+      service: truenas
+      middlewares:
+        - private-net
+        - truenas-client-cert-info
+        - truenas-revocation-check
+      tls:
+        certResolver: letsencrypt
+        options: truenas-client-mtls@file
+
+    amp:
+      rule: Host(`amp.home.northlake.dev`)
+      entryPoints:
+        - https
+      service: amp
+      middlewares:
+        - private-net
+      tls:
+        certResolver: letsencrypt
+
+  middlewares:
+    private-net:
+      ipAllowList:
+        sourceRange:
+          - 10.0.0.0/8
+          - 100.86.0.0/16
+
+    frigate-oauth-auth:
+      forwardAuth:
+        address: http://frigate-oauth2-proxy:4180/oauth2/auth
+        trustForwardHeader: true
+        authResponseHeaders:
+          - X-Auth-Request-User
+          - X-Auth-Request-Email
+          - X-Auth-Request-Groups
+
+    frigate-oauth-errors:
+      errors:
+        status:
+          - "401-403"
+        service: frigate-oauth2-proxy@docker
+        query: /oauth2/sign_in?rd={url}
+        statusRewrites:
+          "401": 302
+
+    frigate-redirect-to-home:
+      redirectRegex:
+        regex: '^https?://frigate\.northlake\.dev(?:/.*)?$'
+        replacement: https://frigate.home.northlake.dev
+        permanent: true
+
+    auth-headers:
+      headers:
+        sslRedirect: true
+        stsSeconds: 315360000
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        frameDeny: true
+
+    truenas-client-cert-info:
+      passTLSClientCert:
+        info:
+          serialNumber: true
+          notAfter: true
+          notBefore: true
+          subject:
+            commonName: true
+            organization: true
+          issuer:
+            commonName: true
+            organization: true
+
+    truenas-revocation-check:
+      forwardAuth:
+        address: http://mtls-revocation-checker:8080/auth
+        trustForwardHeader: true
+        maxResponseBodySize: 8192
+
+  services:
+    homeassistant:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.155:9999
+
+    picpeak:
+      loadBalancer:
+        servers:
+          - url: http://10.10.50.253:3000
+
+    jellyfin:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.6:8096
+
+    pve1:
+      loadBalancer:
+        servers:
+          - url: https://10.10.70.100:8006
+        serversTransport: pve1-transport
+
+    pve2:
+      loadBalancer:
+        servers:
+          - url: https://10.10.70.200:8006
+        serversTransport: pve2-transport
+
+    truenas:
+      loadBalancer:
+        servers:
+          - url: https://10.10.60.250
+        serversTransport: truenas-transport
+
+    amp:
+      loadBalancer:
+        servers:
+          - url: http://10.10.50.50:8080
+
+  serversTransports:
+    kanidm-public-cert:
+      serverName: idm.northlake.dev
+    pve1-transport:
+      insecureSkipVerify: true
+    pve2-transport:
+      insecureSkipVerify: true
+    truenas-transport:
+      insecureSkipVerify: true
+
+tls:
+  options:
+    truenas-client-mtls:
+      maxVersion: VersionTLS12
+      clientAuth:
+        clientAuthType: RequireAndVerifyClientCert
+        caFiles:
+          - /etc/traefik/dynamic/certs/northlake-identity-issuing-ca-01.crt.pem
+          - /etc/traefik/dynamic/certs/northlake-root-ca.crt.pem

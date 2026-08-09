@@ -36,3 +36,19 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - traefik-private
+    labels:
+      traefik.enable: "true"
+      northlake.traefik.scope: private
+      traefik.docker.network: traefik-private
+      traefik.http.routers.openbao.rule: Host(`secrets.cloud.northlake.dev`)
+      traefik.http.routers.openbao.entrypoints: https
+      traefik.http.routers.openbao.middlewares: private-net@file
+      traefik.http.routers.openbao.tls.certresolver: letsencrypt
+      traefik.http.services.openbao.loadbalancer.server.port: "8200"
+
+networks:
+  traefik-private:
+    name: traefik-private
+    external: true

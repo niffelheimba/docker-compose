@@ -5,20 +5,30 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    ports:
-      - "4180:4180"
     networks:
       - default
-      - traefik-net
+      - traefik-public
+    labels:
+      traefik.enable: "true"
+      northlake.traefik.scope: public
+      traefik.docker.network: traefik-public
+      traefik.http.routers.frigate-oauth2.rule: Host(`frigate.home.northlake.dev`) && PathPrefix(`/oauth2/`)
+      traefik.http.routers.frigate-oauth2.entrypoints: https
+      traefik.http.routers.frigate-oauth2.middlewares: auth-headers@file
+      traefik.http.routers.frigate-oauth2.priority: "100"
+      traefik.http.routers.frigate-oauth2.service: frigate-oauth2-proxy
+      traefik.http.routers.frigate-oauth2.tls.certresolver: letsencrypt
+      traefik.http.services.frigate-oauth2-proxy.loadbalancer.server.port: "4180"
   redis:
     image: redis:7-alpine
     container_name: frigate-oauth2-redis
     restart: unless-stopped
     networks:
       - default
-      - traefik-net
+    labels:
+      traefik.enable: "false"
 
 networks:
-  traefik-net:
+  traefik-public:
+    name: traefik-public
     external: true
-    name: nl10-traefik_traefik-net
