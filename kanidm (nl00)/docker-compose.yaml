@@ -5,6 +5,7 @@ services:
     restart: unless-stopped
 
     ports:
+      - "8443:8443"
       - "8444:8444"
 
     user: "1003:1003"
@@ -21,22 +22,10 @@ services:
       - /home/docker-secure/docker-compose/KanIDM/override.css:/hpkg/override.css:ro
 
     networks:
-      - traefik-private
-    labels:
-      traefik.enable: "true"
-      northlake.traefik.scope: private
-      traefik.docker.network: traefik-private
-      traefik.http.routers.kanidm.rule: Host(`idm.northlake.dev`)
-      traefik.http.routers.kanidm.entrypoints: https
-      traefik.http.routers.kanidm.middlewares: private-net@file
-      traefik.http.routers.kanidm.tls.certresolver: letsencrypt
-      traefik.http.services.kanidm.loadbalancer.server.port: "8443"
-      traefik.http.services.kanidm.loadbalancer.server.scheme: https
-      traefik.http.services.kanidm.loadbalancer.serverstransport: kanidm-internal@file
+      - kanidm-net
 
 networks:
-  traefik-private:
-    name: traefik-private
+  kanidm-net:
     external: true
 
 volumes:

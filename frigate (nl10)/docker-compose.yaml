@@ -25,6 +25,7 @@ services:
           size: 3000000000
           
     ports:
+      - "8971:8971" # Authenticated UI consumed by remote Traefik.
       # - "5000:5000" # Internal unauthenticated access. Expose carefully.
       - "8554:8554" # RTSP feeds
       - "8555:8555/tcp" # WebRTC over tcp
@@ -33,23 +34,6 @@ services:
     mem_limit: 8g
     security_opt:
       - no-new-privileges:true
-    networks:
-      - traefik-public
-    labels:
-      traefik.enable: "true"
-      northlake.traefik.scope: public
-      traefik.docker.network: traefik-public
-      traefik.http.routers.frigate.rule: Host(`frigate.home.northlake.dev`)
-      traefik.http.routers.frigate.entrypoints: https
-      traefik.http.routers.frigate.middlewares: frigate-oauth-errors@file,frigate-oauth-auth@file
-      traefik.http.routers.frigate.service: frigate
-      traefik.http.routers.frigate.tls.certresolver: letsencrypt
-      traefik.http.routers.frigate-redirect.rule: Host(`frigate.northlake.dev`)
-      traefik.http.routers.frigate-redirect.entrypoints: https
-      traefik.http.routers.frigate-redirect.middlewares: frigate-redirect-to-home@file
-      traefik.http.routers.frigate-redirect.service: frigate
-      traefik.http.routers.frigate-redirect.tls.certresolver: letsencrypt
-      traefik.http.services.frigate.loadbalancer.server.port: "8971"
 
 #    env_file:
 #      - stack.env
@@ -60,8 +44,3 @@ volumes:
         type: "nfs4"
         o: "addr=10.10.60.250,nolock,hard,rw"
         device: ":/mnt/NAS1/NFS/Frigate"
-
-networks:
-  traefik-public:
-    name: traefik-public
-    external: true

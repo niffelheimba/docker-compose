@@ -9,8 +9,7 @@ services:
       - .env
     networks:
       - default
-    labels:
-      traefik.enable: "false"
+      - caddy-net
 
   semaphore:
     restart: unless-stopped
@@ -21,22 +20,11 @@ services:
       - mysql
     networks:
       - default
-      - traefik-private
-    labels:
-      traefik.enable: "true"
-      northlake.traefik.scope: private
-      traefik.docker.network: traefik-private
-      traefik.http.routers.semaphore.rule: Host(`semaphore.cloud.northlake.dev`)
-      traefik.http.routers.semaphore.entrypoints: https
-      traefik.http.routers.semaphore.middlewares: private-net@file
-      traefik.http.routers.semaphore.tls.certresolver: letsencrypt
-      traefik.http.services.semaphore.loadbalancer.server.port: "3000"
 
 volumes:
   semaphore-mysql:
     name: semaphore_semaphore-mysql
 
 networks:
-  traefik-private:
-    name: traefik-private
+  caddy-net:
     external: true

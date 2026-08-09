@@ -1,8 +1,10 @@
 services:
   actual_server:
     image: docker.io/actualbudget/actual-server:latest
-    env_file:
+    environment:
       - .env
+    ports:
+      - "5007:5006"
       # Uncomment any of the lines below to set configuration options.
       # - ACTUAL_HTTPS_KEY=/data/selfhost.key
       # - ACTUAL_HTTPS_CERT=/data/selfhost.crt
@@ -24,18 +26,3 @@ services:
       retries: 3
       start_period: 20s
     restart: unless-stopped
-    networks:
-      - traefik-public
-    labels:
-      traefik.enable: "true"
-      northlake.traefik.scope: public
-      traefik.docker.network: traefik-public
-      traefik.http.routers.actual-family.rule: Host(`family.actualbudget.home.northlake.dev`)
-      traefik.http.routers.actual-family.entrypoints: https
-      traefik.http.routers.actual-family.tls.certresolver: letsencrypt
-      traefik.http.services.actual-family.loadbalancer.server.port: "5006"
-
-networks:
-  traefik-public:
-    name: traefik-public
-    external: true

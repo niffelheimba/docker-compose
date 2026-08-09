@@ -1,0 +1,105 @@
+http:
+  routers:
+    status:
+      rule: Host(`status.cloud.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: status
+      tls:
+        certResolver: letsencrypt
+
+    vaultwarden:
+      rule: Host(`vault.cloud.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: vaultwarden
+      tls:
+        certResolver: letsencrypt
+
+    kanidm:
+      rule: Host(`idm.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: kanidm
+      middlewares:
+        - private-net
+      tls:
+        certResolver: letsencrypt
+
+    openbao:
+      rule: Host(`secrets.cloud.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: openbao
+      middlewares:
+        - private-net
+      tls:
+        certResolver: letsencrypt
+
+    semaphore:
+      rule: Host(`semaphore.cloud.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: semaphore
+      middlewares:
+        - private-net
+      tls:
+        certResolver: letsencrypt
+
+    arcane:
+      rule: Host(`arcane.cloud.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: arcane
+      middlewares:
+        - private-net
+      tls:
+        certResolver: letsencrypt
+
+  middlewares:
+    private-net:
+      ipAllowList:
+        sourceRange:
+          - 10.0.0.0/8
+          - 100.86.0.0/16
+          - 172.16.0.0/12
+          - 192.168.0.0/16
+          - 127.0.0.1/32
+
+  services:
+    status:
+      loadBalancer:
+        servers:
+          - url: http://uptime-kuma-uptime-kuma-1:3001
+
+    vaultwarden:
+      loadBalancer:
+        servers:
+          - url: http://vaultwarden:80
+
+    kanidm:
+      loadBalancer:
+        servers:
+          - url: https://kanidm:8443
+        serversTransport: kanidm-internal
+
+    openbao:
+      loadBalancer:
+        servers:
+          - url: http://openbao:8200
+
+    semaphore:
+      loadBalancer:
+        servers:
+          - url: http://semaphore:3000
+
+    arcane:
+      loadBalancer:
+        servers:
+          - url: http://arcane:3552
+
+  serversTransports:
+    kanidm-internal:
+      serverName: idm.northlake.dev
+      rootCAs:
+        - /etc/traefik/certs/northlake-kanidm-internal-ca.crt

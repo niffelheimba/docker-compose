@@ -3,28 +3,26 @@ services:
     image: traefik:v3.7.1
     container_name: traefik
     restart: unless-stopped
-    environment:
-      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
+    env_file:
+      - ./.env
     ports:
-      - "${BIND_IP:-10.0.0.154}:80:80"
-      - "${BIND_IP:-10.0.0.154}:443:443"
-      - "${BIND_IP:-10.0.0.154}:443:443/udp"
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
     command:
       - --global.sendAnonymousUsage=false
       - --api.dashboard=false
-      - --entryPoints.http.address=:80
-      - --entryPoints.https.address=:443
-      - --entryPoints.http.http.redirections.entryPoint.to=https
-      - --entryPoints.http.http.redirections.entryPoint.scheme=https
-      - --entryPoints.https.http.tls.certResolver=letsencrypt
-      - --entryPoints.https.http3=true
-      - --providers.docker=true
-      - --providers.docker.endpoint=unix:///var/run/docker.sock
-      - --providers.docker.exposedByDefault=false
+      - --entryPoints.web.address=:80
+      - --entryPoints.websecure.address=:443
+      - --entryPoints.web.http.redirections.entryPoint.to=websecure
+      - --entryPoints.web.http.redirections.entryPoint.scheme=https
+      - --entryPoints.websecure.http.tls.certResolver=letsencrypt
+      - --entryPoints.websecure.http3=true
+      - --providers.docker=false
       - --providers.file.directory=/etc/traefik/dynamic
       - --providers.file.watch=true
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
-      - --certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:-nd.personal@icloud.com}
+      - --certificatesresolvers.letsencrypt.acme.email=nd.personal@icloud.com
       - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
       - --log.level=info
       - --log.format=common
@@ -32,22 +30,25 @@ services:
       - --accesslog.format=json
       - --accesslog.filepath=/var/log/traefik/access.log
     volumes:
-      - ${ROOTLESS_DOCKER_SOCKET:-/run/user/1003/docker.sock}:/var/run/docker.sock:ro
       - /home/docker-secure/docker-state/traefik/letsencrypt:/letsencrypt
       - /home/docker-secure/docker-state/traefik/logs:/var/log/traefik
-      - ./config/dynamic.yml:/etc/traefik/dynamic/dynamic.yml:ro
-      - ./config/certs:/etc/traefik/dynamic/certs:ro
-      - /home/docker-secure/docker-compose/KanIDM/internal-certs/traefik/northlake-kanidm-internal-ca.crt:/etc/traefik/dynamic/certs/northlake-kanidm-internal-ca.crt:ro
+      - ./config:/etc/traefik/dynamic:ro
+      - /home/docker-secure/docker-compose/KanIDM/internal-certs/traefik/northlake-kanidm-internal-ca.crt:/etc/traefik/certs/northlake-kanidm-internal-ca.crt:ro
     networks:
-      - traefik-public
-      - traefik-private
-    labels:
-      traefik.enable: "false"
+      - uptime-net
+      - kanidm-net
+      - vaultwarden-net
+      - caddy-net
+      - arcane-net
 
 networks:
-  traefik-public:
-    name: traefik-public
-    driver: bridge
-  traefik-private:
-    name: traefik-private
-    driver: bridge
+  uptime-net:
+    external: true
+  kanidm-net:
+    external: true
+  vaultwarden-net:
+    external: true
+  caddy-net:
+    external: true
+  arcane-net:
+    external: true

@@ -3,45 +3,33 @@ services:
     image: traefik:v3.7.1
     container_name: traefik
     restart: unless-stopped
-    environment:
-      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
+    env_file:
+      - ./.env
     ports:
-      - "${BIND_IP:-10.10.50.100}:80:80"
-      - "${BIND_IP:-10.10.50.100}:443:443"
-      - "${BIND_IP:-10.10.50.100}:443:443/udp"
+      - "80:80"
+      - "443:443"
     command:
       - --global.sendAnonymousUsage=false
       - --api.dashboard=false
-      - --entryPoints.http.address=:80
-      - --entryPoints.https.address=:443
-      - --entryPoints.http.http.redirections.entryPoint.to=https
-      - --entryPoints.http.http.redirections.entryPoint.scheme=https
-      - --entryPoints.https.http.tls.certResolver=letsencrypt
-      - --entryPoints.https.http3=true
-      - --providers.docker=true
-      - --providers.docker.endpoint=unix:///var/run/docker.sock
-      - --providers.docker.exposedByDefault=false
+      - --entryPoints.web.address=:80
+      - --entryPoints.websecure.address=:443
+      - --entryPoints.web.http.redirections.entryPoint.to=websecure
+      - --entryPoints.web.http.redirections.entryPoint.scheme=https
+      - --entryPoints.websecure.http.tls.certResolver=letsencrypt
+      - --providers.docker=false
       - --providers.file.directory=/etc/traefik/dynamic
       - --providers.file.watch=true
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
-      - --certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:-nd.personal@icloud.com}
+      - --certificatesresolvers.letsencrypt.acme.email=nd.personal@icloud.com
       - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
       - --log.level=info
       - --log.format=common
-      - --accesslog=true
-      - --accesslog.format=json
-      - --accesslog.filepath=/var/log/traefik/access.log
     volumes:
-      - ${DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock:ro
       - /home/service/docker-state/traefik/letsencrypt:/letsencrypt
       - /home/service/docker-state/traefik/logs:/var/log/traefik
-      - ./config/dynamic.yml:/etc/traefik/dynamic/dynamic.yml:ro
-      - ./config/certs:/etc/traefik/dynamic/certs:ro
+      - ./config:/etc/traefik/dynamic:ro
     networks:
-      - traefik-public
-      - traefik-private
-    labels:
-      traefik.enable: "false"
+      - traefik-net
 
   mtls-revocation-checker:
     image: python:3.13-alpine
@@ -55,14 +43,8 @@ services:
     volumes:
       - ./revocation-checker:/app:ro
     networks:
-      - traefik-private
-    labels:
-      traefik.enable: "false"
+      - traefik-net
 
 networks:
-  traefik-public:
-    name: traefik-public
-    driver: bridge
-  traefik-private:
-    name: traefik-private
+  traefik-net:
     driver: bridge

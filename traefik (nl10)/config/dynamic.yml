@@ -1,9 +1,49 @@
 http:
   routers:
+    karakeep:
+      rule: Host(`karakeep.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: karakeep
+      tls:
+        certResolver: letsencrypt
+
+    frigate-redirect:
+      rule: Host(`frigate.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: frigate
+      middlewares:
+        - frigate-redirect-to-home
+      tls:
+        certResolver: letsencrypt
+
+    frigate:
+      rule: Host(`frigate.home.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: frigate
+      middlewares:
+        - frigate-oauth-errors
+        - frigate-oauth-auth
+      tls:
+        certResolver: letsencrypt
+
+    frigate-oauth2:
+      rule: Host(`frigate.home.northlake.dev`) && PathPrefix(`/oauth2/`)
+      entryPoints:
+        - websecure
+      service: frigate-oauth2-proxy
+      middlewares:
+        - auth-headers
+      priority: 100
+      tls:
+        certResolver: letsencrypt
+
     homeassistant:
       rule: Host(`homeassistant.northlake.dev`)
       entryPoints:
-        - https
+        - websecure
       service: homeassistant
       tls:
         certResolver: letsencrypt
@@ -11,7 +51,7 @@ http:
     picpeak:
       rule: Host(`picpeak.northlake.dev`)
       entryPoints:
-        - https
+        - websecure
       service: picpeak
       tls:
         certResolver: letsencrypt
@@ -19,15 +59,47 @@ http:
     jellyfin:
       rule: Host(`stream.home.northlake.dev`)
       entryPoints:
-        - https
+        - websecure
       service: jellyfin
+      tls:
+        certResolver: letsencrypt
+
+    kanidm:
+      rule: Host(`idm.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: kanidm
+      tls:
+        certResolver: letsencrypt
+
+    actual-nicholas:
+      rule: Host(`nicholas.actualbudget.home.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: actual-nicholas
+      tls:
+        certResolver: letsencrypt
+
+    actual-family:
+      rule: Host(`family.actualbudget.home.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: actual-family
+      tls:
+        certResolver: letsencrypt
+
+    actual-jacob:
+      rule: Host(`jacob.actualbudget.home.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: actual-jacob
       tls:
         certResolver: letsencrypt
 
     pve1:
       rule: Host(`pve1.home.northlake.dev`)
       entryPoints:
-        - https
+        - websecure
       service: pve1
       middlewares:
         - private-net
@@ -37,7 +109,7 @@ http:
     pve2:
       rule: Host(`pve2.home.northlake.dev`)
       entryPoints:
-        - https
+        - websecure
       service: pve2
       middlewares:
         - private-net
@@ -47,7 +119,7 @@ http:
     truenas:
       rule: Host(`truenas.home.northlake.dev`)
       entryPoints:
-        - https
+        - websecure
       service: truenas
       middlewares:
         - private-net
@@ -60,7 +132,7 @@ http:
     amp:
       rule: Host(`amp.home.northlake.dev`)
       entryPoints:
-        - https
+        - websecure
       service: amp
       middlewares:
         - private-net
@@ -87,7 +159,7 @@ http:
       errors:
         status:
           - "401-403"
-        service: frigate-oauth2-proxy@docker
+        service: frigate-oauth2-proxy
         query: /oauth2/sign_in?rd={url}
         statusRewrites:
           "401": 302
@@ -129,6 +201,21 @@ http:
         maxResponseBodySize: 8192
 
   services:
+    karakeep:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.200:3000
+
+    frigate:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.200:8971
+
+    frigate-oauth2-proxy:
+      loadBalancer:
+        servers:
+          - url: http://frigate-oauth2-proxy:4180
+
     homeassistant:
       loadBalancer:
         servers:
@@ -143,6 +230,27 @@ http:
       loadBalancer:
         servers:
           - url: http://10.10.60.6:8096
+
+    kanidm:
+      loadBalancer:
+        servers:
+          - url: https://10.10.50.100:8443
+        serversTransport: kanidm-transport
+
+    actual-nicholas:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.200:5006
+
+    actual-family:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.200:5007
+
+    actual-jacob:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.200:5008
 
     pve1:
       loadBalancer:
@@ -168,8 +276,8 @@ http:
           - url: http://10.10.50.50:8080
 
   serversTransports:
-    kanidm-public-cert:
-      serverName: idm.northlake.dev
+    kanidm-transport:
+      insecureSkipVerify: true
     pve1-transport:
       insecureSkipVerify: true
     pve2-transport:

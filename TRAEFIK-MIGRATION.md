@@ -1,38 +1,31 @@
-# Traefik migration
+# Traefik deployment
 
-Each location runs one Traefik container on its existing host address. Public
-and private routers share HTTPS port 443; private routers require the
-`private-net@file` middleware.
+Both locations use Traefik's file provider. Docker discovery is disabled, no
+Docker socket is mounted, and application Compose files do not contain Traefik
+labels.
 
-## Prerequisites
+## NL10
 
-1. Copy the applicable Traefik `.env.example` to `.env` and set the Cloudflare
-   DNS API token. The host bind address, ACME email, and Docker socket already
-   have location-specific defaults and need values only when overriding them.
-2. Ensure the rootless user can write the ACME and log state directories in the
-   Traefik Compose file.
-3. Start the Traefik Compose project once to create the named `traefik-public`
-   and `traefik-private` networks. Application projects reference these shared
-   names as external networks.
+NL10 retains its prior IP-based routing. Services on `10.10.60.200` must keep
+their published ports available to the Traefik host:
 
-## Semaphore rename
+- Karakeep: 3000
+- Frigate authenticated UI: 8971
+- Actual Budget: 5006, 5007, and 5008
 
-The stack moved from `semaphore (nl10)` to `semaphore (nl00)`. Copy its local
-`.env` to the new directory before deployment. The Compose file pins the MySQL
-volume to `semaphore_semaphore-mysql` so the existing database volume is reused.
-Confirm this with `docker volume inspect semaphore_semaphore-mysql` before
-starting the renamed stack.
+Kanidm remains reachable on `10.10.50.100:8443`. oauth2-proxy shares the
+existing `nl10-traefik_traefik-net` network with Traefik.
 
-## Cutover
+## NL00
 
-1. Run `docker compose config` in every changed stack directory.
-2. Stop the old Caddy container on NL00 or old Traefik container on NL10 so it
-   releases ports 80 and 443.
-3. Start the new Traefik stack; this creates the shared proxy networks.
-4. Recreate every changed application stack so Docker applies its labels and
-   network attachments.
-5. Verify public and private routes, then remove obsolete proxy containers.
+NL00's former Caddy routes are declared in
+`traefik (nl00)/config/dynamic_config.yml`. Traefik joins the same external
+networks previously used by Caddy. OpenBao and Semaphore explicitly join
+`caddy-net` so their Docker DNS names remain reachable.
 
-Private DNS is not an access control. Every private Docker router must include
-`private-net@file`, and private application HTTP ports must not be published on
-the host.
+## Deployment
+
+1. Copy each Traefik `.env.example` to `.env` and set `CF_DNS_API_TOKEN`.
+2. Run `docker compose config` in each changed project.
+3. Recreate applications whose ports or network attachments changed.
+4. Restart Traefik and check its logs for file-provider or ACME errors.

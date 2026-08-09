@@ -17,22 +17,12 @@ services:
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - JWT_SECRET=${JWT_SECRET}
     networks:
-      - traefik-private
+      - arcane-net
     restart: unless-stopped
-    labels:
-      traefik.enable: "true"
-      northlake.traefik.scope: private
-      traefik.docker.network: traefik-private
-      traefik.http.routers.arcane.rule: Host(`arcane.cloud.northlake.dev`)
-      traefik.http.routers.arcane.entrypoints: https
-      traefik.http.routers.arcane.middlewares: private-net@file
-      traefik.http.routers.arcane.tls.certresolver: letsencrypt
-      traefik.http.services.arcane.loadbalancer.server.port: "3552"
 
 volumes:
   arcane-data:
 
 networks:
-  traefik-private:
-    name: traefik-private
+  arcane-net:
     external: true
