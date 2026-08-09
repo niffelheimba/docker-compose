@@ -29,6 +29,7 @@ services:
       - --accesslog=true
       - --accesslog.format=json
       - --accesslog.filepath=/var/log/traefik/access.log
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53 # Oracle DNS does not work for the DNS challenge.
     volumes:
       - /home/docker-secure/docker-state/traefik/letsencrypt:/letsencrypt
       - /home/docker-secure/docker-state/traefik/logs:/var/log/traefik
@@ -40,6 +41,7 @@ services:
       - vaultwarden-net
       - caddy-net
       - arcane-net
+      - semaphore-net
 
 networks:
   uptime-net:
@@ -51,4 +53,6 @@ networks:
   caddy-net:
     external: true
   arcane-net:
+    external: true
+  semaphore-net:
     external: true
