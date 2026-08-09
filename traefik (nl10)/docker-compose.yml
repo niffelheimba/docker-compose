@@ -6,9 +6,9 @@ services:
     environment:
       CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
     ports:
-      - "${BIND_IP:-10.10.50.50}:80:80"
-      - "${BIND_IP:-10.10.50.50}:443:443"
-      - "${BIND_IP:-10.10.50.50}:443:443/udp"
+      - "${BIND_IP:-10.10.50.100}:80:80"
+      - "${BIND_IP:-10.10.50.100}:443:443"
+      - "${BIND_IP:-10.10.50.100}:443:443/udp"
     command:
       - --global.sendAnonymousUsage=false
       - --api.dashboard=false
@@ -32,7 +32,7 @@ services:
       - --accesslog.format=json
       - --accesslog.filepath=/var/log/traefik/access.log
     volumes:
-      - ${ROOTLESS_DOCKER_SOCKET:-/run/user/1000/docker.sock}:/var/run/docker.sock:ro
+      - ${DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock:ro
       - /home/service/docker-state/traefik/letsencrypt:/letsencrypt
       - /home/service/docker-state/traefik/logs:/var/log/traefik
       - ./config/dynamic.yml:/etc/traefik/dynamic/dynamic.yml:ro

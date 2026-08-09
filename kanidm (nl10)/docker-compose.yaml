@@ -8,7 +8,7 @@ services:
     volumes:
       - /home/service/docker-state/traefik/letsencrypt:/traefik:ro
       - ./certs:/output:rw
-      - ${ROOTLESS_DOCKER_SOCKET:-/run/user/1000/docker.sock}:/var/run/docker.sock:ro
+      - ${DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock:ro
     environment:
       DOMAIN: idm.northlake.dev
       OVERRIDE_UID: "1000"

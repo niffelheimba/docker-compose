@@ -7,7 +7,7 @@ and private routers share HTTPS port 443; private routers require the
 ## Prerequisites
 
 1. Copy the applicable Traefik `.env.example` to `.env` and set the Cloudflare
-   DNS API token. The host bind address, ACME email, and rootless socket already
+   DNS API token. The host bind address, ACME email, and Docker socket already
    have location-specific defaults and need values only when overriding them.
 2. Ensure the rootless user can write the ACME and log state directories in the
    Traefik Compose file.
