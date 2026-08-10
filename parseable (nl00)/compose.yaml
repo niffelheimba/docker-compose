@@ -1,0 +1,21 @@
+services:
+  parseable:
+    image: quay.io/parseablehq/parseable:latest
+    container_name: parseable
+    restart: unless-stopped
+
+    command:
+      - parseable
+      - local-store
+
+    env_file:
+      - .env
+
+    ports:
+#      - "8000:8000"
+      - "8001:8001"
+      - "8002:8002"
+
+    volumes:
+      - ./data:/parseable/data
+      - ./staging:/parseable/staging
