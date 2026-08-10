@@ -7,6 +7,9 @@ services:
       - semaphore-mysql:/var/lib/mysql
     env_file:
       - .env
+    networks:
+      - default
+      - caddy-net
 
   semaphore:
     restart: unless-stopped
@@ -15,11 +18,13 @@ services:
       - .env
     depends_on:
       - mysql
+    networks:
+      - default
 
 volumes:
   semaphore-mysql:
     name: semaphore_semaphore-mysql
 
 networks:
-  default:
-    name: semaphore_default
+  caddy-net:
+    external: true
