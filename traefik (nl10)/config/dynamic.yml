@@ -26,6 +26,7 @@ http:
       middlewares:
         - frigate-oauth-errors
         - frigate-oauth-auth
+        - frigate-proxy-secret
       tls:
         certResolver: letsencrypt
 
