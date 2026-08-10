@@ -19,3 +19,7 @@ services:
     volumes:
       - ./data:/parseable/data
       - ./staging:/parseable/staging
+
+networks:
+  default:
+    name: parseable_default

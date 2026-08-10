@@ -39,9 +39,10 @@ services:
       - uptime-net
       - kanidm-net
       - vaultwarden-net
-      - caddy-net
+      - openbao-net
       - arcane-net
       - semaphore-net
+      - parseable-net
 
 networks:
   uptime-net:
@@ -50,9 +51,14 @@ networks:
     external: true
   vaultwarden-net:
     external: true
-  caddy-net:
+  openbao-net:
     external: true
+    name: openbao_default
   arcane-net:
     external: true
   semaphore-net:
     external: true
+    name: semaphore_default
+  parseable-net:
+    external: true
+    name: parseable_default
