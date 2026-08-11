@@ -21,8 +21,6 @@ services:
     depends_on:
       - certdumper
     ports:
-      - "8443:8443"
-      - "8444:8444"
       - "3636:3636"
     extra_hosts:
       - "idm.northlake.dev:10.0.0.154"

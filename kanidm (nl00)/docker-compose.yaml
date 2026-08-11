@@ -4,10 +4,6 @@ services:
     container_name: kanidm
     restart: unless-stopped
 
-    ports:
-      - "8443:8443"
-      - "8444:8444"
-
     user: "1003:1003"
 
     env_file:
