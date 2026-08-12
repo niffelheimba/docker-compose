@@ -24,6 +24,9 @@ services:
       - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
       - --log.level=info
       - --log.format=common
+      - --accesslog=true
+      - --accesslog.format=json
+      - --accesslog.filepath=/var/log/traefik/access.log
     volumes:
       - /home/service/docker-state/traefik/letsencrypt:/letsencrypt
       - /home/service/docker-state/traefik/logs:/var/log/traefik

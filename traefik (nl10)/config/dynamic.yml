@@ -144,8 +144,15 @@ http:
     private-net:
       ipAllowList:
         sourceRange:
-          - 10.0.0.0/8
+          - 10.0.0.0/24
+          - 10.10.0.0/24
+          - 10.10.10.0/24
+          - 10.10.50.0/24
+          - 10.10.60.0/24
+          - 10.10.70.0/24
           - 100.86.0.0/16
+          - 192.168.100.0/24
+          - 127.0.0.1/32
 
     frigate-oauth-auth:
       forwardAuth:
@@ -235,7 +242,7 @@ http:
     kanidm:
       loadBalancer:
         servers:
-          - url: https://10.10.50.100:8443
+          - url: https://kanidm-home:8443
         serversTransport: kanidm-transport
 
     actual-nicholas:

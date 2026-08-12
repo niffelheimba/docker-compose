@@ -5,8 +5,6 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    ports:
-      - "4180:4180"
     networks:
       - default
       - traefik-net
