@@ -65,6 +65,16 @@ http:
       tls:
         certResolver: letsencrypt
 
+    watch:
+      rule: Host(`watch.home.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: watch
+      middlewares:
+        - private-net
+      tls:
+        certResolver: letsencrypt
+
     kanidm:
       rule: Host(`idm.northlake.dev`)
       entryPoints:
@@ -238,6 +248,11 @@ http:
       loadBalancer:
         servers:
           - url: http://10.10.60.6:8096
+
+    watch:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.6:8080
 
     kanidm:
       loadBalancer:
