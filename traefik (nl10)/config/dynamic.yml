@@ -140,6 +140,14 @@ http:
         certResolver: letsencrypt
         options: truenas-client-mtls@file
 
+    rustfs:
+      rule: Host(`rustfs.home.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: rustfs
+      tls:
+        certResolver: letsencrypt
+
     amp:
       rule: Host(`amp.home.northlake.dev`)
       entryPoints:
@@ -292,6 +300,11 @@ http:
         servers:
           - url: https://10.10.60.250
         serversTransport: truenas-transport
+
+    rustfs:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.250:30293
 
     amp:
       loadBalancer:
