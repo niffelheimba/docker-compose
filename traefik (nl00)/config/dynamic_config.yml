@@ -1,10 +1,22 @@
 http:
   routers:
     status:
+      rule: Host(`status.cloud.northlake.dev`) && (Path(`/status`) || PathPrefix(`/status/`) || PathPrefix(`/assets/`) || PathPrefix(`/api/status-page/`) || Path(`/api/entry-page`) || PathPrefix(`/upload/`) || Path(`/favicon.ico`) || Path(`/icon.svg`))
+      entryPoints:
+        - websecure
+      service: status
+      priority: 100
+      tls:
+        certResolver: letsencrypt
+
+    status-admin:
       rule: Host(`status.cloud.northlake.dev`)
       entryPoints:
         - websecure
       service: status
+      middlewares:
+        - private-net
+      priority: 10
       tls:
         certResolver: letsencrypt
 
@@ -21,8 +33,6 @@ http:
       entryPoints:
         - websecure
       service: kanidm
-      middlewares:
-        - private-net
       tls:
         certResolver: letsencrypt
 
