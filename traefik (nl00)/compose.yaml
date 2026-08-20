@@ -40,7 +40,6 @@ services:
       - caddy-net
       - arcane-net
       - semaphore-net
-      - parseable-net
 
 networks:
   uptime-net:
@@ -56,6 +55,3 @@ networks:
   semaphore-net:
     external: true
     name: semaphore_default
-  parseable-net:
-    external: true
-    name: parseable_default

@@ -66,16 +66,6 @@ http:
       tls:
         certResolver: letsencrypt
 
-    parseable:
-      rule: Host(`parseable.cloud.northlake.dev`)
-      entryPoints:
-        - websecure
-      service: parseable
-      middlewares:
-        - private-net
-      tls:
-        certResolver: letsencrypt
-
   middlewares:
     private-net:
       ipAllowList:
@@ -122,11 +112,6 @@ http:
       loadBalancer:
         servers:
           - url: http://arcane:3552
-
-    parseable:
-      loadBalancer:
-        servers:
-          - url: http://parseable:8000
 
   serversTransports:
     kanidm-internal:

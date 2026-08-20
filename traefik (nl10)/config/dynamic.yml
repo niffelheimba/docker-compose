@@ -158,6 +158,16 @@ http:
       tls:
         certResolver: letsencrypt
 
+    parseable:
+      rule: Host(`parseable.home.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: parseable
+      middlewares:
+        - private-net
+      tls:
+        certResolver: letsencrypt
+
   middlewares:
     private-net:
       ipAllowList:
@@ -310,6 +320,11 @@ http:
       loadBalancer:
         servers:
           - url: http://10.10.50.50:8080
+
+    parseable:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.200:8000
 
   serversTransports:
     kanidm-transport:
