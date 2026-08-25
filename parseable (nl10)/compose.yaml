@@ -8,6 +8,11 @@ services:
       - parseable
       - s3-store
 
+    # Arcane manages this file. Loading it here also passes optional settings,
+    # such as P_OIDC_* and P_ORIGIN_URI, through to Parseable.
+    env_file:
+      - .env
+
     environment:
       P_ADDR: 0.0.0.0:8000
       P_STAGING_DIR: /parseable/staging
