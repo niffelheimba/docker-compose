@@ -29,4 +29,6 @@ services:
       - "8000:8000"
 
     volumes:
-      - ./staging:/parseable/staging
+      # Keep the former local-store staging data intact. S3 mode must begin
+      # with an empty staging directory that matches the new object store.
+      - ./staging-s3:/parseable/staging
