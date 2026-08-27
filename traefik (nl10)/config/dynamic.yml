@@ -49,6 +49,16 @@ http:
       tls:
         certResolver: letsencrypt
 
+    homeassistant-home:
+      rule: Host(`homeassistant.home.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: homeassistant-home
+      middlewares:
+        - private-net
+      tls:
+        certResolver: letsencrypt
+
     picpeak:
       rule: Host(`picpeak.northlake.dev`)
       entryPoints:
@@ -252,6 +262,11 @@ http:
       loadBalancer:
         servers:
           - url: http://10.10.60.155:9999
+
+    homeassistant-home:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.170:8123
 
     picpeak:
       loadBalancer:
