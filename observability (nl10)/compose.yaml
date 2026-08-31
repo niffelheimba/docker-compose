@@ -1,0 +1,38 @@
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD in Arcane}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./config/grafana/provisioning/datasources/loki.yml:/etc/grafana/provisioning/datasources/loki.yml:ro
+    depends_on:
+      - loki
+
+  loki:
+    image: grafana/loki:3.7.0
+    container_name: loki
+    restart: unless-stopped
+    command:
+      - -config.file=/etc/loki/loki.yml
+      - -config.expand-env=true
+    ports:
+      - "3100:3100"
+    environment:
+      S3_ENDPOINT: ${S3_ENDPOINT:?Set S3_ENDPOINT in Arcane}
+      S3_BUCKET: ${S3_BUCKET:-loki}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:?Set S3_ACCESS_KEY in Arcane}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:?Set S3_SECRET_KEY in Arcane}
+      S3_REGION: ${S3_REGION:-us-east-1}
+    volumes:
+      - ./config/loki/loki.yml:/etc/loki/loki.yml:ro
+      - loki-data:/loki
+volumes:
+  grafana-data:
+  loki-data:

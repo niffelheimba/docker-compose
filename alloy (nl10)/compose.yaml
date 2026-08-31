@@ -1,0 +1,19 @@
+services:
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    restart: unless-stopped
+    command:
+      - run
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+    environment:
+      HOST_NAME: ${HOST_NAME:?Set HOST_NAME in Arcane}
+      LOKI_URL: ${LOKI_URL:?Set LOKI_URL in Arcane}
+    volumes:
+      - ./config/config.alloy:/etc/alloy/config.alloy:ro
+      - alloy-data:/var/lib/alloy/data
+      - ${DOCKER_SOCKET:?Set DOCKER_SOCKET in Arcane}:/var/run/docker.sock:ro
+
+volumes:
+  alloy-data:
