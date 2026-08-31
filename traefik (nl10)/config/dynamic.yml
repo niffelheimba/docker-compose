@@ -174,7 +174,7 @@ http:
         - websecure
       service: loki
       middlewares:
-        - private-net
+        - loki-ingest-net
       tls:
         certResolver: letsencrypt
 
@@ -207,6 +207,16 @@ http:
           - 100.86.0.0/16
           - 192.168.100.0/24
           - 127.0.0.1/32
+
+    loki-ingest-net:
+      ipAllowList:
+        sourceRange:
+          - 10.0.0.0/16
+          - 10.10.0.0/16
+          - 100.86.0.0/16
+          - 192.168.100.0/24
+          - 127.0.0.1/32
+          - 172.30.0.1/32
 
     frigate-oauth-auth:
       forwardAuth:
