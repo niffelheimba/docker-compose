@@ -5,10 +5,8 @@ services:
     restart: unless-stopped
     ports:
       - "3001:3000"
-    environment:
-      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD in Arcane}
-      GF_USERS_ALLOW_SIGN_UP: "false"
+    env_file:
+      - .env
     volumes:
       - grafana-data:/var/lib/grafana
       - ./config/grafana/provisioning/datasources/loki.yml:/etc/grafana/provisioning/datasources/loki.yml:ro
