@@ -168,6 +168,16 @@ http:
       tls:
         certResolver: letsencrypt
 
+    loki:
+      rule: Host(`loki.home.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: loki
+      middlewares:
+        - private-net
+      tls:
+        certResolver: letsencrypt
+
     amp:
       rule: Host(`amp.home.northlake.dev`)
       entryPoints:
@@ -341,6 +351,11 @@ http:
       loadBalancer:
         servers:
           - url: http://10.10.60.250:30292
+
+    loki:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.200:3100
 
     amp:
       loadBalancer:

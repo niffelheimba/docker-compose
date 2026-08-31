@@ -13,7 +13,7 @@ services:
     volumes:
       - ./config/config.alloy:/etc/alloy/config.alloy:ro
       - alloy-data:/var/lib/alloy/data
-      - ${DOCKER_SOCKET:?Set DOCKER_SOCKET in Arcane}:/var/run/docker.sock:ro
+      - ${DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock:ro
 
 volumes:
   alloy-data:
