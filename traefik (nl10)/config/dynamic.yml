@@ -158,6 +158,16 @@ http:
       tls:
         certResolver: letsencrypt
 
+    rustfs-s3:
+      rule: Host(`s3.home.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: rustfs-s3
+      middlewares:
+        - private-net
+      tls:
+        certResolver: letsencrypt
+
     amp:
       rule: Host(`amp.home.northlake.dev`)
       entryPoints:
@@ -326,6 +336,11 @@ http:
       loadBalancer:
         servers:
           - url: http://10.10.60.250:30293
+
+    rustfs-s3:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.250:30292
 
     amp:
       loadBalancer:
