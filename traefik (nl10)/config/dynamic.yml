@@ -350,7 +350,7 @@ http:
     grafana:
       loadBalancer:
         servers:
-          - url: http://10.10.60.200:3000
+          - url: http://10.10.60.200:3001
 
   serversTransports:
     kanidm-transport:
