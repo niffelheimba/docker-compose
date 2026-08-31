@@ -9,6 +9,9 @@ services:
     env_file:
       - .env
 
+    ports:
+      - "8444:8444"
+
     volumes:
       - kanidm_data:/data
       - /home/docker-secure/docker-compose/KanIDM/server.toml:/server.toml:ro

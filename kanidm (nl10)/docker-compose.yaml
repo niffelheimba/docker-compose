@@ -22,6 +22,7 @@ services:
       - certdumper
     ports:
       - "3636:3636"
+      - "8444:8444"
     extra_hosts:
       - "idm.northlake.dev:10.0.0.154"
     volumes:
