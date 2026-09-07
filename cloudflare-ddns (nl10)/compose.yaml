@@ -1,0 +1,11 @@
+version: '3.9'
+services:
+  cloudflare-ddns:
+    image: timothyjmiller/cloudflare-ddns:latest
+    container_name: cloudflare-ddns
+    security_opt:
+      - no-new-privileges:true
+#    network_mode: 'host' # only needed for ipv6
+    env_file:
+      - .env
+    restart: unless-stopped
