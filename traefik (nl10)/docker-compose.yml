@@ -26,7 +26,7 @@ services:
       - --log.format=common
       - --accesslog=true
       - --accesslog.format=json
-      - --accesslog.filepath=/var/log/traefik/access.log
+      # Send JSON access logs to stdout so Alloy's Docker source collects them.
     volumes:
       - /home/service/docker-state/traefik/letsencrypt:/letsencrypt
       - /home/service/docker-state/traefik/logs:/var/log/traefik

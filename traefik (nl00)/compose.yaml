@@ -26,7 +26,7 @@ services:
       - --log.format=common
       - --accesslog=true
       - --accesslog.format=json
-      - --accesslog.filepath=/var/log/traefik/access.log
+      # Send JSON access logs to stdout so Alloy's Docker source collects them.
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53 # Oracle DNS does not work for the DNS challenge.
     volumes:
       - /home/docker-secure/docker-state/traefik/letsencrypt:/letsencrypt
