@@ -1,6 +1,6 @@
 services:
   kanidm:
-    image: kanidm/server:1.11.0
+    image: kanidm/server:1.11.2
     container_name: kanidm
     restart: unless-stopped
 
