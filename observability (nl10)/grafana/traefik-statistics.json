@@ -1,0 +1,914 @@
+{
+  "uid": "traefik-statistics",
+  "title": "Traefik Statistics",
+  "description": "Traefik operational log statistics and HTTP traffic/latency from JSON access logs. HTTP panels require access-log ingestion.",
+  "schemaVersion": 42,
+  "editable": true,
+  "tags": [
+    "traefik",
+    "loki",
+    "observability"
+  ],
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "links": [
+    {
+      "title": "Docker & Host Logs",
+      "type": "link",
+      "url": "/d/docker-host-logs/docker-and-host-logs",
+      "keepTime": true
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "host",
+        "label": "Traefik host",
+        "type": "query",
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        },
+        "query": "label_values({source=\"docker\",container=\"traefik\"},host)",
+        "definition": "label_values({source=\"docker\",container=\"traefik\"},host)",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "refresh": 2,
+        "sort": 1,
+        "options": []
+      },
+      {
+        "name": "search",
+        "label": "Log text filter",
+        "type": "textbox",
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        }
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Collection status and how to read this dashboard",
+      "type": "text",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [],
+      "options": {
+        "mode": "markdown",
+        "content": "**Operational logs are available now. HTTP request statistics are awaiting access-log collection.** Traefik currently writes JSON access logs to `/var/log/traefik/access.log`, outside the Docker log stream collected by Alloy. Send access logs to stdout (remove `--accesslog.filepath`) and redeploy Traefik, or configure Alloy to tail that file. Request panels populate automatically once JSON access logs arrive. Empty request panels do **not** mean zero traffic. Log activity does not prove proxy health."
+      }
+    },
+    {
+      "id": 2,
+      "title": "Operational error lines",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 3,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Error-severity operational lines in the selected range. Includes canceled ForwardAuth requests.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "Awaiting access logs",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(count_over_time({source=\"docker\",container=\"traefik\",host=~\"${host:regex}\"} !~ `\"DownstreamStatus\"\\s*:` | decolorize | line_format `{{ __line__ }}` |~ `\\bERR\\b|level=error` [$__range])) or vector(0)",
+          "queryType": "instant",
+          "instant": true,
+          "legendFormat": ""
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Operational warning lines",
+      "type": "stat",
+      "gridPos": {
+        "x": 6,
+        "y": 3,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Warning-severity operational lines in the selected range.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "Awaiting access logs",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(count_over_time({source=\"docker\",container=\"traefik\",host=~\"${host:regex}\"} !~ `\"DownstreamStatus\"\\s*:` | decolorize | line_format `{{ __line__ }}` |~ `\\bWRN\\b|level=warn` [$__range])) or vector(0)",
+          "queryType": "instant",
+          "instant": true,
+          "legendFormat": ""
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Canceled auth requests",
+      "type": "stat",
+      "gridPos": {
+        "x": 12,
+        "y": 3,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "ForwardAuth requests canceled before completion. Inspect timing and repetition; these alone do not prove an authentication outage.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "Awaiting access logs",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 1
+              },
+              {
+                "color": "blue",
+                "value": 10
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(count_over_time({source=\"docker\",container=\"traefik\",host=~\"${host:regex}\"} !~ `\"DownstreamStatus\"\\s*:` | decolorize | line_format `{{ __line__ }}` |= \"ForwardAuth\" |= \"context canceled\" [$__range])) or vector(0)",
+          "queryType": "instant",
+          "instant": true,
+          "legendFormat": ""
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Other operational errors",
+      "type": "stat",
+      "gridPos": {
+        "x": 18,
+        "y": 3,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Error lines excluding context-canceled messages.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "Awaiting access logs",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(count_over_time({source=\"docker\",container=\"traefik\",host=~\"${host:regex}\"} !~ `\"DownstreamStatus\"\\s*:` | decolorize | line_format `{{ __line__ }}` |~ `\\bERR\\b|level=error` != \"context canceled\" [$__range])) or vector(0)",
+          "queryType": "instant",
+          "instant": true,
+          "legendFormat": ""
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "HTTP requests",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 7,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Requests completed and logged in the selected range. Requires JSON access logs.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "Awaiting access logs",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Awaiting access logs",
+                  "color": "text"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(count_over_time({source=\"docker\",container=\"traefik\",host=~\"${host:regex}\"} | json status=\"DownstreamStatus\", router=\"RouterName\", duration=\"Duration\", request_host=\"RequestHost\", method=\"RequestMethod\", path=\"RequestPath\" | __error__=\"\" | status!=\"\" [$__range]))",
+          "queryType": "instant",
+          "instant": true,
+          "legendFormat": ""
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "HTTP 5xx responses",
+      "type": "stat",
+      "gridPos": {
+        "x": 6,
+        "y": 7,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "HTTP server-error responses in the selected range. Shows zero only when access data exists.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "Awaiting access logs",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Awaiting access logs",
+                  "color": "text"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(count_over_time({source=\"docker\",container=\"traefik\",host=~\"${host:regex}\"} | json status=\"DownstreamStatus\", router=\"RouterName\", duration=\"Duration\", request_host=\"RequestHost\", method=\"RequestMethod\", path=\"RequestPath\" | __error__=\"\" | status!=\"\" | status=~\"5..\" [$__range])) or (0 * sum(count_over_time({source=\"docker\",container=\"traefik\",host=~\"${host:regex}\"} | json status=\"DownstreamStatus\", router=\"RouterName\", duration=\"Duration\", request_host=\"RequestHost\", method=\"RequestMethod\", path=\"RequestPath\" | __error__=\"\" | status!=\"\" [$__range])))",
+          "queryType": "instant",
+          "instant": true,
+          "legendFormat": ""
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "HTTP 5xx percentage",
+      "type": "stat",
+      "gridPos": {
+        "x": 12,
+        "y": 7,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Server-error responses divided by all logged responses over the same selected range.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "noValue": "Awaiting access logs",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Awaiting access logs",
+                  "color": "text"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "100 * (sum(count_over_time({source=\"docker\",container=\"traefik\",host=~\"${host:regex}\"} | json status=\"DownstreamStatus\", router=\"RouterName\", duration=\"Duration\", request_host=\"RequestHost\", method=\"RequestMethod\", path=\"RequestPath\" | __error__=\"\" | status!=\"\" | status=~\"5..\" [$__range])) or (0 * sum(count_over_time({source=\"docker\",container=\"traefik\",host=~\"${host:regex}\"} | json status=\"DownstreamStatus\", router=\"RouterName\", duration=\"Duration\", request_host=\"RequestHost\", method=\"RequestMethod\", path=\"RequestPath\" | __error__=\"\" | status!=\"\" [$__range])))) / sum(count_over_time({source=\"docker\",container=\"traefik\",host=~\"${host:regex}\"} | json status=\"DownstreamStatus\", router=\"RouterName\", duration=\"Duration\", request_host=\"RequestHost\", method=\"RequestMethod\", path=\"RequestPath\" | __error__=\"\" | status!=\"\" [$__range]))",
+          "queryType": "instant",
+          "instant": true,
+          "legendFormat": ""
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "Request latency p95",
+      "type": "stat",
+      "gridPos": {
+        "x": 18,
+        "y": 7,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "95th percentile of completed request duration over the selected range, converted from nanoseconds to milliseconds. Long-lived streams can raise this value.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "noValue": "Awaiting access logs",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "Awaiting access logs",
+                  "color": "text"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "quantile_over_time(0.95, {source=\"docker\",container=\"traefik\",host=~\"${host:regex}\"} | json status=\"DownstreamStatus\", router=\"RouterName\", duration=\"Duration\", request_host=\"RequestHost\", method=\"RequestMethod\", path=\"RequestPath\" | __error__=\"\" | status!=\"\" | unwrap duration | __error__=\"\" [$__range]) by () / 1000000",
+          "queryType": "instant",
+          "instant": true,
+          "legendFormat": ""
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 10,
+      "title": "Requests per minute by status",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 11,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Request rate grouped by HTTP status; requires access logs.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (status) (rate({source=\"docker\",container=\"traefik\",host=~\"${host:regex}\"} | json status=\"DownstreamStatus\", router=\"RouterName\", duration=\"Duration\", request_host=\"RequestHost\", method=\"RequestMethod\", path=\"RequestPath\" | __error__=\"\" | status!=\"\" [$__interval])) * 60",
+          "queryType": "range",
+          "instant": false,
+          "legendFormat": "HTTP {{status}}"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "title": "Requests per minute by router",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 11,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Router traffic from JSON access logs.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (router) (rate({source=\"docker\",container=\"traefik\",host=~\"${host:regex}\"} | json status=\"DownstreamStatus\", router=\"RouterName\", duration=\"Duration\", request_host=\"RequestHost\", method=\"RequestMethod\", path=\"RequestPath\" | __error__=\"\" | status!=\"\" [$__interval])) * 60",
+          "queryType": "range",
+          "instant": false,
+          "legendFormat": "{{router}}"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 12,
+      "title": "Operational errors by host",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 19,
+        "w": 12,
+        "h": 7
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Error lines per interval by Traefik host.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (host) (count_over_time({source=\"docker\",container=\"traefik\",host=~\"${host:regex}\"} !~ `\"DownstreamStatus\"\\s*:` | decolorize | line_format `{{ __line__ }}` |~ `\\bERR\\b|level=error` [$__interval]))",
+          "queryType": "range",
+          "instant": false,
+          "legendFormat": "{{host}}"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 13,
+      "title": "Errors by middleware (selected range)",
+      "type": "table",
+      "gridPos": {
+        "x": 12,
+        "y": 19,
+        "w": 12,
+        "h": 7
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Which middleware produces operational errors; blank middleware means the line did not identify one.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (host,middleware) (count_over_time({source=\"docker\",container=\"traefik\",host=~\"${host:regex}\"} !~ `\"DownstreamStatus\"\\s*:` | decolorize | line_format `{{ __line__ }}` |~ `\\bERR\\b|level=error` | regexp `middlewareName=(?P<middleware>[^ ]+)` [$__range]))",
+          "queryType": "instant",
+          "instant": true,
+          "legendFormat": "{{host}} / {{middleware}}"
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "host": "Host",
+              "middleware": "Middleware",
+              "Value": "Errors",
+              "Value #A": "Errors"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "title": "Operational logs — original messages",
+      "type": "logs",
+      "gridPos": {
+        "x": 0,
+        "y": 26,
+        "w": 24,
+        "h": 10
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Original Traefik messages with ANSI color codes removed. Text filter applies here and to access logs.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{source=\"docker\",container=\"traefik\",host=~\"${host:regex}\"} !~ `\"DownstreamStatus\"\\s*:` | decolorize | line_format `{{ __line__ }}` |= \"$search\" | line_format \"{{.host}} | {{ __line__ }}\"",
+          "queryType": "range",
+          "instant": false,
+          "legendFormat": ""
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": false,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "sortOrder": "Descending",
+        "dedupStrategy": "none"
+      }
+    },
+    {
+      "id": 15,
+      "title": "HTTP access logs — status, route, request, duration",
+      "type": "logs",
+      "gridPos": {
+        "x": 0,
+        "y": 36,
+        "w": 24,
+        "h": 10
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Readable request summary. Expand log details to inspect parsed fields. Duration is in nanoseconds in this log view.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{source=\"docker\",container=\"traefik\",host=~\"${host:regex}\"} | json status=\"DownstreamStatus\", router=\"RouterName\", duration=\"Duration\", request_host=\"RequestHost\", method=\"RequestMethod\", path=\"RequestPath\" | __error__=\"\" | status!=\"\" |= \"$search\" | line_format \"{{.status}} | {{.method}} {{.request_host}}{{.path}} | router={{.router}} | duration_ns={{.duration}} | host={{.host}}\"",
+          "queryType": "range",
+          "instant": false,
+          "legendFormat": ""
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": false,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "sortOrder": "Descending",
+        "dedupStrategy": "none"
+      }
+    }
+  ]
+}

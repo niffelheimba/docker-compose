@@ -1,0 +1,581 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [
+    {
+      "title": "Traefik Statistics",
+      "type": "link",
+      "url": "/d/traefik-statistics/traefik-statistics",
+      "keepTime": true,
+      "targetBlank": false
+    }
+  ],
+  "panels": [
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Containers that emitted at least one log line in the last five minutes. This is activity, not a Docker running-state check.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "count(sum by (host, container) (count_over_time({source=\"docker\",host=~\"${host:regex}\",compose_project=~\"${project:regex}\",container=~\"${container:regex}\"}[5m]))) or vector(0)",
+          "instant": true,
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "Containers with logs (last 5m)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Error/failure/fatal/panic messages, excluding Loki/Grafana, informational logs, and known FFmpeg timestamp warnings. Zero means no matching errors, not confirmed service health.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 8,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "sum(count_over_time({source=\"docker\",container!~\"grafana|loki\",service!=\"loki\",service_name!=\"loki\",host=~\"${host:regex}\",compose_project=~\"${project:regex}\",container=~\"${container:regex}\"} | decolorize | line_format `{{ __line__ }}` |~ `(?i)\\b(err(or)?|exception|failed|failure|fatal|panic)\\b` !~ `(?i)(\\b(level[=:]\"?(info|debug|warn)|INFO|DEBUG|WRN)\\b|without errors?|no errors?|Non-monotonic DTS|Timestamps are unset in a packet|The following ffmpeg logs include)` [$__range])) or vector(0)",
+          "instant": true,
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "Actionable error lines in range",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Populates after Alloy journald collection is enabled.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 16,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "noValue": "Not collected",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "sum(count_over_time({source=\"journal\",host=~\"${host:regex}\"}[$__range]))",
+          "instant": true,
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "Host journal lines in range",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Shows all matching errors. Warning notifications require at least 5 lines per host/container/component/cause in 5 minutes, with the condition held for 2 minutes. FFmpeg worker failures can interrupt one camera while Frigate remains running.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
+            ]
+          },
+          "unit": "short",
+          "noValue": "No matching errors"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Cause"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 600
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Container"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "View container logs",
+                    "url": "/d/docker-host-logs/docker-and-host-logs?var-host=${__data.fields[\"Host\"]}&var-project=All&var-container=${__value.raw}&from=${__from}&to=${__to}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "id": 4,
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (host,container,compose_project,component,reason) (count_over_time({source=\"docker\",container!~\"grafana|loki\",service!=\"loki\",service_name!=\"loki\",host=~\"${host:regex}\",compose_project=~\"${project:regex}\",container=~\"${container:regex}\"} | decolorize | line_format `{{ __line__ }}` |~ `(?i)\\b(err(or)?|exception|failed|failure|fatal|panic)\\b` !~ `(?i)(\\b(level[=:]\"?(info|debug|warn)|INFO|DEBUG|WRN)\\b|without errors?|no errors?|Non-monotonic DTS|Timestamps are unset in a packet|The following ffmpeg logs include)` | regexp `(?:watchdog|ffmpeg)\\.(?P<camera>[A-Za-z0-9_-]+)` | label_format component=`{{if .camera}}{{.camera}}{{else}}{{.container}}{{end}}`, reason=`{{if contains \"No new valid recording segments\" (__line__)}}Camera recording stalled for 120 seconds; FFmpeg restart requested{{else if contains \"crashed unexpectedly\" (__line__)}}Camera FFmpeg worker crashed; check stream and recording recovery{{else if contains \"Connection timed out\" (__line__)}}Upstream connection timed out{{else if contains \"context canceled\" (__line__)}}Request canceled during upstream authentication{{else if contains \"Error opening input\" (__line__)}}FFmpeg could not open the camera stream{{else if contains \"Unable to read frames\" (__line__)}}Camera frames unavailable{{else}}Application reported an error; inspect matching logs{{end}}` [5m]))",
+          "instant": true,
+          "legendFormat": "{{host}} / {{component}} — {{reason}}",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "Recent errors by component and cause (last 5m)",
+      "type": "table",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "host": "Host",
+              "container": "Container",
+              "compose_project": "Project",
+              "component": "Component / camera",
+              "reason": "Cause",
+              "Value": "Lines (5m)",
+              "Value #A": "Lines (5m)"
+            },
+            "indexByName": {
+              "host": 0,
+              "container": 1,
+              "component": 2,
+              "reason": 3,
+              "compose_project": 4,
+              "Value #A": 5
+            }
+          }
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 12,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            }
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 11
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [
+            "sum",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (host,container) (count_over_time({source=\"docker\",host=~\"${host:regex}\",compose_project=~\"${project:regex}\",container=~\"${container:regex}\"}[$__interval]))",
+          "legendFormat": "{{host}} / {{container}}",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Log volume by container",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 31,
+        "w": 24,
+        "h": 10
+      },
+      "id": 6,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "expr": "{source=\"docker\",host=~\"${host:regex}\",compose_project=~\"${project:regex}\",container=~\"${container:regex}\"} |= \"$search\" | decolorize | line_format `{{ __line__ }}` | line_format \"{{if .container}}{{.container}}{{else}}{{.unit}}{{end}} | {{ __line__ }}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Container logs",
+      "type": "logs"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 19,
+        "w": 24,
+        "h": 12
+      },
+      "id": 7,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "expr": "{source=\"docker\",container!~\"grafana|loki\",service!=\"loki\",service_name!=\"loki\",host=~\"${host:regex}\",compose_project=~\"${project:regex}\",container=~\"${container:regex}\"} | decolorize | line_format `{{ __line__ }}` |~ `(?i)\\b(err(or)?|exception|failed|failure|fatal|panic)\\b` !~ `(?i)(\\b(level[=:]\"?(info|debug|warn)|INFO|DEBUG|WRN)\\b|without errors?|no errors?|Non-monotonic DTS|Timestamps are unset in a packet|The following ffmpeg logs include)` | regexp `(?:watchdog|ffmpeg)\\.(?P<camera>[A-Za-z0-9_-]+)` | label_format component=`{{if .camera}}{{.camera}}{{else}}{{.container}}{{end}}`, reason=`{{if contains \"No new valid recording segments\" (__line__)}}Camera recording stalled for 120 seconds; FFmpeg restart requested{{else if contains \"crashed unexpectedly\" (__line__)}}Camera FFmpeg worker crashed; check stream and recording recovery{{else if contains \"Connection timed out\" (__line__)}}Upstream connection timed out{{else if contains \"context canceled\" (__line__)}}Request canceled during upstream authentication{{else if contains \"Error opening input\" (__line__)}}FFmpeg could not open the camera stream{{else if contains \"Unable to read frames\" (__line__)}}Camera frames unavailable{{else}}Application reported an error; inspect matching logs{{end}}` |= \"${search}\" | line_format \"{{.host}} / {{.container}} / {{.component}} | {{.reason}} | {{ __line__ }}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Errors explained — component, cause, and original message",
+      "type": "logs",
+      "description": "Original message is retained after a concise cause. Known FFmpeg timestamp warnings are hidden here but remain in Container logs. Loki and Grafana are excluded from this view."
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Systemd journal messages collected by Alloy; use log details to inspect host, unit, and priority.",
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 41
+      },
+      "id": 8,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "expr": "{source=\"journal\",host=~\"${host:regex}\"} |= \"$search\" | decolorize | line_format `{{ __line__ }}` | line_format \"{{if .container}}{{.container}}{{else}}{{.unit}}{{end}} | {{ __line__ }}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Host journal",
+      "type": "logs"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 42,
+  "tags": [
+    "docker",
+    "loki",
+    "alloy",
+    "logs"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        },
+        "definition": "label_values({source=~\"docker|journal\"}, host)",
+        "includeAll": true,
+        "label": "Host",
+        "multi": true,
+        "name": "host",
+        "options": [],
+        "query": "label_values({source=~\"docker|journal\"}, host)",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query",
+        "allValue": ".*"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        },
+        "definition": "label_values({source=\"docker\", host=~\"${host:regex}\"}, compose_project)",
+        "includeAll": true,
+        "label": "Compose project",
+        "multi": true,
+        "name": "project",
+        "options": [],
+        "query": "label_values({source=\"docker\", host=~\"${host:regex}\"}, compose_project)",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        },
+        "definition": "label_values({source=\"docker\", host=~\"${host:regex}\", compose_project=~\"${project:regex}\"}, container)",
+        "includeAll": true,
+        "label": "Container",
+        "multi": true,
+        "name": "container",
+        "options": [],
+        "query": "label_values({source=\"docker\", host=~\"${host:regex}\", compose_project=~\"${project:regex}\"}, container)",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "label": "Text filter",
+        "name": "search",
+        "query": "",
+        "type": "textbox"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Docker & Host Logs",
+  "uid": "docker-host-logs",
+  "weekStart": "",
+  "description": "Docker and host logs with actionable error classification. Loki/Grafana application logs are excluded from error views. Counts are log-derived, not container health."
+}

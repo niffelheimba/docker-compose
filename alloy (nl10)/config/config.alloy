@@ -67,6 +67,113 @@ loki.source.journal "host" {
   }
 }
 
+// UniFi emits CEF directly, rather than consistently wrapping it in an RFC3164
+// or RFC5424 syslog envelope. Keep the original event as the log line, extract
+// the stable CEF dimensions as labels, and retain identifiers/network details
+// as structured metadata instead of creating one Loki stream per value.
+loki.process "unifi_cef" {
+  forward_to = [loki.write.central.receiver]
+
+  stage.static_labels {
+    values = {
+      job    = "unifi",
+      site   = "nl10",
+      source = "siem",
+    }
+  }
+
+  // CEF:Version|Vendor|Product|DeviceVersion|EventClassID|Name|Severity|Extension
+  stage.regex {
+    expression = "^CEF:(?P<cef_version>[^|]*)\\|(?P<device_vendor>[^|]*)\\|(?P<device_product>[^|]*)\\|(?P<device_version>[^|]*)\\|(?P<event_id>[^|]*)\\|(?P<event_type>[^|]*)\\|(?P<severity>[^|]*)\\|(?P<cef_extension>.*)$"
+  }
+
+  // These extension values are simple tokens in CEF. More complex CEF values
+  // (for example msg= values containing spaces) remain safely available in the
+  // original log line instead of being incorrectly split.
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)act=(?P<action>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)src=(?P<src_ip>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)dst=(?P<dst_ip>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)spt=(?P<src_port>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)dpt=(?P<dst_port>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)smac=(?P<src_mac>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)dmac=(?P<dst_mac>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)suser=(?P<username>[^\\s]+)"
+  }
+
+  // Ensure events without CEF's optional act= extension stay in one bounded
+  // action label value rather than gaining a dynamic fallback.
+  stage.template {
+    source   = "action"
+    template = "{{ if .Value }}{{ ToLower .Value }}{{ else }}unknown{{ end }}"
+  }
+
+  stage.labels {
+    values = {
+      severity   = "",
+      event_type = "",
+      action     = "",
+    }
+  }
+
+  stage.structured_metadata {
+    values = {
+      cef_version    = "",
+      device_vendor  = "",
+      device_product = "",
+      device_version = "",
+      event_id       = "",
+      src_ip         = "",
+      dst_ip         = "",
+      src_port       = "",
+      dst_port       = "",
+      src_mac        = "",
+      dst_mac        = "",
+      username       = "",
+    }
+  }
+}
+
+// Listen on both transports. Prefer TCP in UniFi when the UI offers it; the
+// UDP listener is intentional compatibility for versions exposing only IP/port.
+loki.source.syslog "unifi_cef" {
+  listener {
+    address       = "0.0.0.0:1514"
+    protocol      = "tcp"
+    syslog_format = "raw"
+  }
+
+  listener {
+    address       = "0.0.0.0:1514"
+    protocol      = "udp"
+    syslog_format = "raw"
+  }
+
+  forward_to = [loki.process.unifi_cef.receiver]
+}
+
 loki.write "central" {
   endpoint {
     url = sys.env("LOKI_URL")

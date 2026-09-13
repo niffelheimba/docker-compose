@@ -1,0 +1,216 @@
+[
+  {
+    "operation": "update",
+    "org_id": 1,
+    "rule_uid": "bfwvsu495fr40d",
+    "title": "Docker container ongoing errors",
+    "folder_uid": "observability",
+    "rule_group": "Docker Logs",
+    "condition": "C",
+    "no_data_state": "OK",
+    "exec_err_state": "Error",
+    "for": "2m0s",
+    "labels": {
+      "severity": "warning",
+      "source": "docker"
+    },
+    "annotations": {
+      "__dashboardUid__": "docker-host-logs",
+      "__panelId__": "7",
+      "summary": "Repeated errors in {{ $labels.container }} / {{ $labels.component }} on {{ $labels.host }}",
+      "description": "{{ printf \"%.0f\" $values.B.Value }} matching lines in the last 5 minutes. Cause: {{ $labels.reason }}. Host: {{ $labels.host }}. Compose project: {{ $labels.compose_project }}. Component: {{ $labels.component }}. Fires at 5+ matching lines with the condition held for 2 minutes. Camera worker errors can affect recording while Frigate stays running. Open the linked dashboard for original messages.",
+      "runbook_url": "/d/docker-host-logs/docker-and-host-logs?var-host={{ $labels.host }}&var-project={{ $labels.compose_project }}&var-container={{ $labels.container }}&from=now-1h&to=now"
+    },
+    "data": [
+      {
+        "datasourceUid": "loki",
+        "model": {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "editorMode": "code",
+          "expr": "sum by (host, container, compose_project, component, reason) (count_over_time({source=\"docker\",container!~\"grafana|loki\",service!=\"loki\",service_name!=\"loki\"} | decolorize | line_format `{{ __line__ }}` |~ `(?i)\\b(err(or)?|exception|failed|failure|fatal|panic)\\b` !~ `(?i)(\\b(level[=:]\"?(info|debug|warn)|INFO|DEBUG|WRN)\\b|without errors?|no errors?|Non-monotonic DTS|Timestamps are unset in a packet|The following ffmpeg logs include)` | regexp `(?:watchdog|ffmpeg)\\.(?P<camera>[A-Za-z0-9_-]+)` | label_format component=`{{if .camera}}{{.camera}}{{else}}{{.container}}{{end}}`, reason=`{{if contains \"No new valid recording segments\" (__line__)}}Camera recording stalled for 120 seconds; FFmpeg restart requested{{else if contains \"crashed unexpectedly\" (__line__)}}Camera FFmpeg worker crashed; check stream and recording recovery{{else if contains \"Connection timed out\" (__line__)}}Upstream connection timed out{{else if contains \"context canceled\" (__line__)}}Request canceled during upstream authentication{{else if contains \"Error opening input\" (__line__)}}FFmpeg could not open the camera stream{{else if contains \"Unable to read frames\" (__line__)}}Camera frames unavailable{{else}}Application reported an error; inspect matching logs{{end}}` [5m]))",
+          "intervalMs": 1000,
+          "maxDataPoints": 43200,
+          "queryType": "instant",
+          "refId": "A",
+          "instant": true
+        },
+        "queryType": "instant",
+        "refId": "A",
+        "relativeTimeRange": {
+          "from": 300
+        }
+      },
+      {
+        "datasourceUid": "__expr__",
+        "model": {
+          "datasource": {
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "A",
+          "intervalMs": 1000,
+          "maxDataPoints": 43200,
+          "reducer": "last",
+          "refId": "B",
+          "type": "reduce"
+        },
+        "refId": "B",
+        "relativeTimeRange": {}
+      },
+      {
+        "datasourceUid": "__expr__",
+        "model": {
+          "conditions": [
+            {
+              "evaluator": {
+                "params": [
+                  4
+                ],
+                "type": "gt"
+              },
+              "operator": {
+                "type": "and"
+              },
+              "query": {
+                "params": [
+                  "C"
+                ]
+              },
+              "reducer": {
+                "type": "last"
+              }
+            }
+          ],
+          "datasource": {
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "B",
+          "intervalMs": 1000,
+          "maxDataPoints": 43200,
+          "refId": "C",
+          "type": "threshold"
+        },
+        "refId": "C",
+        "relativeTimeRange": {}
+      }
+    ],
+    "notification_settings": {
+      "active_time_intervals": null,
+      "group_by": null,
+      "mute_time_intervals": null,
+      "receiver": "Discord - Northlake Alerts"
+    },
+    "is_paused": false
+  },
+  {
+    "operation": "update",
+    "org_id": 1,
+    "rule_uid": "bfwvsvcw5m3gge",
+    "title": "Docker container critical log pattern",
+    "folder_uid": "observability",
+    "rule_group": "Docker Logs",
+    "condition": "C",
+    "no_data_state": "OK",
+    "exec_err_state": "Error",
+    "for": "0s",
+    "labels": {
+      "severity": "critical",
+      "source": "docker"
+    },
+    "annotations": {
+      "__dashboardUid__": "docker-host-logs",
+      "__panelId__": "7",
+      "summary": "Critical log pattern in {{ $labels.container }} / {{ $labels.component }} on {{ $labels.host }}",
+      "description": "{{ printf \"%.0f\" $values.B.Value }} critical-pattern lines in the last 5 minutes. {{ $labels.reason }}. Host: {{ $labels.host }}. Project: {{ $labels.compose_project }}. Container: {{ $labels.container }}. Inspect logs and process health; a log pattern alone does not prove the container is down.",
+      "runbook_url": "/d/docker-host-logs/docker-and-host-logs?var-host={{ $labels.host }}&var-project={{ $labels.compose_project }}&var-container={{ $labels.container }}&from=now-1h&to=now"
+    },
+    "data": [
+      {
+        "datasourceUid": "loki",
+        "model": {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "editorMode": "code",
+          "expr": "sum by (host, container, compose_project, component, reason) (count_over_time({source=\"docker\",container!~\"grafana|loki\",service!=\"loki\",service_name!=\"loki\"} | decolorize | line_format `{{ __line__ }}` |~ `(?i)\\b(fatal|panic|segmentation fault|out of memory|oom[- ]kill(ed)?|crash[ -]?loop)\\b` !~ `(?i)(\\b(level[=:]\"?(info|debug)|INFO|DEBUG)\\b|without errors?|no errors?)` | label_format component=container, reason=\"Fatal, panic, memory exhaustion, or crash-loop log pattern\" [5m]))",
+          "intervalMs": 1000,
+          "maxDataPoints": 43200,
+          "queryType": "instant",
+          "refId": "A",
+          "instant": true
+        },
+        "queryType": "instant",
+        "refId": "A",
+        "relativeTimeRange": {
+          "from": 300
+        }
+      },
+      {
+        "datasourceUid": "__expr__",
+        "model": {
+          "datasource": {
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "A",
+          "intervalMs": 1000,
+          "maxDataPoints": 43200,
+          "reducer": "last",
+          "refId": "B",
+          "type": "reduce"
+        },
+        "refId": "B",
+        "relativeTimeRange": {}
+      },
+      {
+        "datasourceUid": "__expr__",
+        "model": {
+          "conditions": [
+            {
+              "evaluator": {
+                "params": [
+                  0
+                ],
+                "type": "gt"
+              },
+              "operator": {
+                "type": "and"
+              },
+              "query": {
+                "params": [
+                  "C"
+                ]
+              },
+              "reducer": {
+                "type": "last"
+              }
+            }
+          ],
+          "datasource": {
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "B",
+          "intervalMs": 1000,
+          "maxDataPoints": 43200,
+          "refId": "C",
+          "type": "threshold"
+        },
+        "refId": "C",
+        "relativeTimeRange": {}
+      }
+    ],
+    "notification_settings": {
+      "active_time_intervals": null,
+      "group_by": null,
+      "mute_time_intervals": null,
+      "receiver": "Discord - Northlake Alerts"
+    },
+    "is_paused": false
+  }
+]
