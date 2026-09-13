@@ -84,7 +84,9 @@ loki.process "unifi_cef" {
 
   // CEF:Version|Vendor|Product|DeviceVersion|EventClassID|Name|Severity|Extension
   stage.regex {
-    expression = "^CEF:(?P<cef_version>[^|]*)\\|(?P<device_vendor>[^|]*)\\|(?P<device_product>[^|]*)\\|(?P<device_version>[^|]*)\\|(?P<event_id>[^|]*)\\|(?P<event_type>[^|]*)\\|(?P<severity>[^|]*)\\|(?P<cef_extension>.*)$"
+    // UniFi may prepend a syslog-style header before the CEF body even when
+    // sent as raw CEF. Match the CEF prefix wherever it begins on the line.
+    expression = "^.*?CEF:(?P<cef_version>[^|]*)\\|(?P<device_vendor>[^|]*)\\|(?P<device_product>[^|]*)\\|(?P<device_version>[^|]*)\\|(?P<event_id>[^|]*)\\|(?P<event_type>[^|]*)\\|(?P<severity>[^|]*)\\|(?P<cef_extension>.*)$"
   }
 
   // These extension values are simple tokens in CEF. More complex CEF values
@@ -122,6 +124,22 @@ loki.process "unifi_cef" {
     source     = "cef_extension"
     expression = "(?:^|\\s)suser=(?P<username>[^\\s]+)"
   }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)UNIFIdeviceIp=(?P<unifi_device_ip>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)UNIFIdeviceMac=(?P<unifi_device_mac>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)UNIFIdeviceModel=(?P<unifi_device_model>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)UNIFIdeviceVersion=(?P<unifi_device_version>[^\\s]+)"
+  }
 
   // Ensure events without CEF's optional act= extension stay in one bounded
   // action label value rather than gaining a dynamic fallback.
@@ -152,6 +170,10 @@ loki.process "unifi_cef" {
       src_mac        = "",
       dst_mac        = "",
       username       = "",
+      unifi_device_ip      = "",
+      unifi_device_mac     = "",
+      unifi_device_model   = "",
+      unifi_device_version = "",
     }
   }
 }
