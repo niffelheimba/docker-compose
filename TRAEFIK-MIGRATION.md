@@ -26,7 +26,7 @@ networks previously used by Caddy. OpenBao and Semaphore explicitly join
 ## Traefik Manager ownership
 
 Arcane/Git remains authoritative for Compose infrastructure, images, networks,
-ports, volumes, environment wiring, and the Manager Agent services. The live
+ports, volumes, environment wiring, and the NL10 Manager Agent service. The live
 file-provider configuration is no longer mounted from the Git-synchronised
 project directory:
 
@@ -53,9 +53,8 @@ definitions, which Traefik Manager can import/adopt.
 2. Add the new `TMA_*` values to each deployed Arcane environment. Set the
    bind addresses to private/Tailscale addresses, not `0.0.0.0`.
 3. Run `docker compose config` in each changed project.
-4. Deploy NL00's `traefik-manager` first. Sign in over its private address on
-   port 5000, add the NL00 agent at `http://traefik-manager-agent:8090`, then
-   put the generated key in `TMA_NL00_API_KEY`.
+4. Deploy NL00's `traefik-manager` first. It connects directly to the local
+   Traefik API and runtime configuration; no NL00 agent or API key is needed.
 5. Add the NL10 agent using its private/Tailscale URL on port 8090, set
    `TMA_NL10_API_KEY`, and restrict its host firewall so only NL00 can reach it.
 6. Deploy/restart the agents and Traefik stacks. Import/adopt the seeded

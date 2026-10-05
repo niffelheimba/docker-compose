@@ -56,6 +56,11 @@ services:
       - ./.env
     environment:
       COOKIE_SECURE: "false"
+      # NL00 is local to the control plane, so Manager connects directly rather
+      # than through a redundant agent.
+      TRAEFIK_API_URL: http://traefik:8080
+      CONFIG_DIR: /app/traefik
+      ACME_JSON_PATH: /letsencrypt/acme.json
     ports:
       # Private/Tailscale only; do not expose the control plane publicly.
       # Loopback is a safe bootstrap default. Override with NL00's private or
@@ -64,25 +69,8 @@ services:
     volumes:
       - /home/docker-secure/docker-state/traefik-manager/config:/app/config
       - /home/docker-secure/docker-state/traefik-manager/backups:/app/backups
-    networks:
-      - traefik-manager-net
-
-  traefik-manager-agent:
-    image: ghcr.io/chr0nzz/traefik-manager-agent:latest
-    container_name: traefik-manager-agent
-    restart: unless-stopped
-    env_file:
-      - ./.env
-    environment:
-      TMA_API_KEY: "${TMA_NL00_API_KEY:-}"
-      TRAEFIK_API_URL: http://traefik:8080
-      CONFIG_PATH: /app/config
-      ACME_JSON_PATH: /letsencrypt/acme.json
-    volumes:
-      - /home/docker-secure/docker-state/traefik/dynamic:/app/config
+      - /home/docker-secure/docker-state/traefik/dynamic:/app/traefik
       - /home/docker-secure/docker-state/traefik/letsencrypt:/letsencrypt:ro
-      - /home/docker-secure/docker-state/traefik/logs:/var/log/traefik:ro
-      - traefik-manager-agent-backups:/app/backups
     networks:
       - traefik-manager-net
 
@@ -102,6 +90,3 @@ networks:
     name: semaphore_default
   traefik-manager-net:
     driver: bridge
-
-volumes:
-  traefik-manager-agent-backups:
