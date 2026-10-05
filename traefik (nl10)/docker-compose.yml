@@ -10,9 +10,10 @@ services:
       - "443:443"
     command:
       - --global.sendAnonymousUsage=false
-      # Internal-only API for the local Traefik Manager agent; port 8080 is
-      # not published on the host.
+      # Internal-only API for Traefik Manager; port 8080 is not published on
+      # the host, so it is reachable only from containers on this Docker network.
       - --api=true
+      - --api.insecure=true
       - --api.dashboard=false
       - --entryPoints.web.address=:80
       - --entryPoints.websecure.address=:443
