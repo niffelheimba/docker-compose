@@ -35,11 +35,11 @@ project directory:
 
 Before redeploying either stack, copy the complete current `./config` directory
 to its corresponding runtime directory. For NL10 this includes `dynamic.yml`,
-`certs/`, and the local untracked secrets configuration if present. For NL00,
-create the runtime `certs/` directory before deployment so the separately
-mounted KanIDM CA has a target. After this one-time seed, Arcane/Git must not
-sync `./config` into either runtime directory; Traefik Manager writes the
-runtime config and makes backups before changes.
+`certs/`, and the local untracked secrets configuration if present. NL00's
+KanIDM CA is an existing independent bind mount at `/etc/traefik/certs`, so it
+does not belong in the Manager-owned runtime directory. After this one-time
+seed, Arcane/Git must not sync `./config` into either runtime directory;
+Traefik Manager writes the runtime config and makes backups before changes.
 
 Frigate's design is unchanged: oauth2-proxy remains its own Compose service
 with KanIDM/OIDC secrets outside Traefik Manager. The seeded NL10 configuration
