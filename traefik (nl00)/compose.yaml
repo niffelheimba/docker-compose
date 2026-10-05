@@ -52,8 +52,6 @@ services:
     image: ghcr.io/chr0nzz/traefik-manager:latest
     container_name: traefik-manager
     restart: unless-stopped
-    env_file:
-      - ./.env
     environment:
       COOKIE_SECURE: "false"
       # NL00 is local to the control plane, so Manager connects directly rather
