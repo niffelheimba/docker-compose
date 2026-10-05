@@ -57,8 +57,8 @@ services:
     ports:
       # Private/Tailscale only; do not expose the control plane publicly.
       # Loopback is a safe bootstrap default. Override with NL00's private or
-      # Tailscale IP in Arcane before accessing the Manager remotely.
-      - "${TMA_NL00_BIND_IP:-127.0.0.1}:5000:5000"
+      # Tailscale IP in Arcane before accessing the Manager UI remotely.
+      - "${TMA_MANAGER_BIND_IP:-127.0.0.1}:5000:5000"
     volumes:
       - /home/docker-secure/docker-state/traefik-manager/config:/app/config
       - /home/docker-secure/docker-state/traefik-manager/backups:/app/backups
