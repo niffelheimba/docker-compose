@@ -47,7 +47,9 @@ services:
       - traefik-manager-net
 
   traefik-manager:
-    image: ghcr.io/chr0nzz/traefik-manager:v1.15.0
+    # Upstream currently publishes the ARM64-compatible Docker image as latest;
+    # the v1.15.0 tag is not available to OCI VM1's Docker engine.
+    image: ghcr.io/chr0nzz/traefik-manager:latest
     container_name: traefik-manager
     restart: unless-stopped
     env_file:
@@ -66,7 +68,7 @@ services:
       - traefik-manager-net
 
   traefik-manager-agent:
-    image: ghcr.io/chr0nzz/traefik-manager-agent:v1.15.0
+    image: ghcr.io/chr0nzz/traefik-manager-agent:latest
     container_name: traefik-manager-agent
     restart: unless-stopped
     env_file:

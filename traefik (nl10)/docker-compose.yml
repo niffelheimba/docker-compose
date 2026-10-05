@@ -39,7 +39,8 @@ services:
       - traefik-net
 
   traefik-manager-agent:
-    image: ghcr.io/chr0nzz/traefik-manager-agent:v1.15.0
+    # Upstream currently publishes the ARM64-compatible Docker image as latest.
+    image: ghcr.io/chr0nzz/traefik-manager-agent:latest
     container_name: traefik-manager-agent
     restart: unless-stopped
     env_file:
