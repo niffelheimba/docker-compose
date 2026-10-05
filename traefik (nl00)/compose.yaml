@@ -54,7 +54,8 @@ services:
     container_name: traefik-manager
     restart: unless-stopped
     environment:
-      COOKIE_SECURE: "false"
+      # Traefik Manager is served through the HTTPS-only public route.
+      COOKIE_SECURE: "true"
       # NL00 is local to the control plane, so Manager connects directly rather
       # than through a redundant agent.
       TRAEFIK_API_URL: http://traefik:8080
