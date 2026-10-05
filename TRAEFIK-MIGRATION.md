@@ -23,9 +23,40 @@ NL00's former Caddy routes are declared in
 networks previously used by Caddy. OpenBao and Semaphore explicitly join
 `caddy-net` so their Docker DNS names remain reachable.
 
+## Traefik Manager ownership
+
+Arcane/Git remains authoritative for Compose infrastructure, images, networks,
+ports, volumes, environment wiring, and the Manager Agent services. The live
+file-provider configuration is no longer mounted from the Git-synchronised
+project directory:
+
+- NL00: `/home/docker-secure/docker-state/traefik/dynamic`
+- NL10: `/home/service/docker-state/traefik/dynamic`
+
+Before redeploying either stack, copy the complete current `./config` directory
+to its corresponding runtime directory. For NL10 this includes `dynamic.yml`,
+`certs/`, and the local untracked secrets configuration if present. For NL00,
+create the runtime `certs/` directory before deployment so the separately
+mounted KanIDM CA has a target. After this one-time seed, Arcane/Git must not
+sync `./config` into either runtime directory; Traefik Manager writes the
+runtime config and makes backups before changes.
+
+Frigate's design is unchanged: oauth2-proxy remains its own Compose service
+with KanIDM/OIDC secrets outside Traefik Manager. The seeded NL10 configuration
+retains the ForwardAuth, error middleware, `/oauth2/` router, and service
+definitions, which Traefik Manager can import/adopt.
+
 ## Deployment
 
-1. Copy each Traefik `.env.example` to `.env` and set `CF_DNS_API_TOKEN`.
-2. Run `docker compose config` in each changed project.
-3. Recreate applications whose ports or network attachments changed.
-4. Restart Traefik and check its logs for file-provider or ACME errors.
+1. Seed the two runtime config directories as described above, before changing
+   the bind mounts.
+2. Add the new `TMA_*` values to each deployed Arcane environment. Set the
+   bind addresses to private/Tailscale addresses, not `0.0.0.0`.
+3. Run `docker compose config` in each changed project.
+4. Deploy NL00's `traefik-manager` first. Sign in over its private address on
+   port 5000, add the NL00 agent at `http://traefik-manager-agent:8090`, then
+   put the generated key in `TMA_NL00_API_KEY`.
+5. Add the NL10 agent using its private/Tailscale URL on port 8090, set
+   `TMA_NL10_API_KEY`, and restrict its host firewall so only NL00 can reach it.
+6. Deploy/restart the agents and Traefik stacks. Import/adopt the seeded
+   file-provider config in Traefik Manager; do not recreate Frigate auth.

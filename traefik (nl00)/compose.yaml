@@ -10,6 +10,9 @@ services:
       - "443:443"
     command:
       - --global.sendAnonymousUsage=false
+      # Internal-only API for the local Traefik Manager agent; port 8080 is
+      # not published on the host.
+      - --api=true
       - --api.dashboard=false
       - --entryPoints.web.address=:80
       - --entryPoints.websecure.address=:443
@@ -31,7 +34,8 @@ services:
     volumes:
       - /home/docker-secure/docker-state/traefik/letsencrypt:/letsencrypt
       - /home/docker-secure/docker-state/traefik/logs:/var/log/traefik
-      - ./config:/etc/traefik/dynamic:ro
+      # Traefik Manager owns this host runtime directory after migration.
+      - /home/docker-secure/docker-state/traefik/dynamic:/etc/traefik/dynamic:ro
       - /home/docker-secure/docker-compose/KanIDM/internal-certs/traefik/northlake-kanidm-internal-ca.crt:/etc/traefik/certs/northlake-kanidm-internal-ca.crt:ro
     networks:
       - uptime-net
@@ -40,6 +44,43 @@ services:
       - caddy-net
       - arcane-net
       - semaphore-net
+      - traefik-manager-net
+
+  traefik-manager:
+    image: ghcr.io/chr0nzz/traefik-manager:v1.15.0
+    container_name: traefik-manager
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      COOKIE_SECURE: "false"
+    ports:
+      # Private/Tailscale only; do not expose the control plane publicly.
+      - "${TMA_NL00_BIND_IP:?Set TMA_NL00_BIND_IP in Arcane}:5000:5000"
+    volumes:
+      - /home/docker-secure/docker-state/traefik-manager/config:/app/config
+      - /home/docker-secure/docker-state/traefik-manager/backups:/app/backups
+    networks:
+      - traefik-manager-net
+
+  traefik-manager-agent:
+    image: ghcr.io/chr0nzz/traefik-manager-agent:v1.15.0
+    container_name: traefik-manager-agent
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      TMA_API_KEY: "${TMA_NL00_API_KEY:-}"
+      TRAEFIK_API_URL: http://traefik:8080
+      CONFIG_PATH: /app/config
+      ACME_JSON_PATH: /letsencrypt/acme.json
+    volumes:
+      - /home/docker-secure/docker-state/traefik/dynamic:/app/config
+      - /home/docker-secure/docker-state/traefik/letsencrypt:/letsencrypt:ro
+      - /home/docker-secure/docker-state/traefik/logs:/var/log/traefik:ro
+      - traefik-manager-agent-backups:/app/backups
+    networks:
+      - traefik-manager-net
 
 networks:
   uptime-net:
@@ -55,3 +96,8 @@ networks:
   semaphore-net:
     external: true
     name: semaphore_default
+  traefik-manager-net:
+    driver: bridge
+
+volumes:
+  traefik-manager-agent-backups:
