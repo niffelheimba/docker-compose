@@ -51,7 +51,9 @@ services:
       ACME_JSON_PATH: /letsencrypt/acme.json
     ports:
       # Private/Tailscale only. Restrict port 8090 to NL00 in the host firewall.
-      - "${TMA_NL10_BIND_IP:?Set TMA_NL10_BIND_IP in Arcane}:8090:8090"
+      # Loopback is a safe bootstrap default. Override with NL10's private or
+      # Tailscale IP in Arcane before registering this remote agent.
+      - "${TMA_NL10_BIND_IP:-127.0.0.1}:8090:8090"
     volumes:
       - /home/service/docker-state/traefik/dynamic:/app/config
       - /home/service/docker-state/traefik/letsencrypt:/letsencrypt:ro
