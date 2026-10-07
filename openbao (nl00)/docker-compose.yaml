@@ -1,6 +1,8 @@
 services:
   openbao:
-    image: docker.io/openbao/openbao:latest
+    # v2.7 removed the legacy file storage backend used by this deployment.
+    # Keep this on the maintained 2.6 release line until the data is migrated.
+    image: docker.io/openbao/openbao:2.6.4
     container_name: openbao
     restart: unless-stopped
 
@@ -32,7 +34,9 @@ services:
       - ./data:/openbao/data
 
     healthcheck:
-      test: ["CMD", "bao", "status"]
+      # The listener is plain HTTP inside the container; Traefik terminates TLS.
+      # Exit status 2 means OpenBao is sealed but otherwise healthy.
+      test: ["CMD-SHELL", "BAO_ADDR=http://127.0.0.1:8200 bao status >/dev/null 2>&1; status=$$?; [ $$status -eq 0 ] || [ $$status -eq 2 ]"]
       interval: 30s
       timeout: 10s
       retries: 3
