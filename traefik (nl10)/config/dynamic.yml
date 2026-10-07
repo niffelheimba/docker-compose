@@ -144,11 +144,8 @@ http:
       service: truenas
       middlewares:
         - private-net
-        - truenas-client-cert-info
-        - truenas-revocation-check
       tls:
         certResolver: letsencrypt
-        options: truenas-client-mtls@file
 
     rustfs:
       rule: Host(`rustfs.home.northlake.dev`)
@@ -252,25 +249,6 @@ http:
         stsIncludeSubdomains: true
         stsPreload: true
         frameDeny: true
-
-    truenas-client-cert-info:
-      passTLSClientCert:
-        info:
-          serialNumber: true
-          notAfter: true
-          notBefore: true
-          subject:
-            commonName: true
-            organization: true
-          issuer:
-            commonName: true
-            organization: true
-
-    truenas-revocation-check:
-      forwardAuth:
-        address: http://mtls-revocation-checker:8080/auth
-        trustForwardHeader: true
-        maxResponseBodySize: 8192
 
   services:
     karakeep:
@@ -387,12 +365,3 @@ http:
     truenas-transport:
       insecureSkipVerify: true
 
-tls:
-  options:
-    truenas-client-mtls:
-      maxVersion: VersionTLS12
-      clientAuth:
-        clientAuthType: RequireAndVerifyClientCert
-        caFiles:
-          - /etc/traefik/dynamic/certs/northlake-identity-issuing-ca-01.crt.pem
-          - /etc/traefik/dynamic/certs/northlake-root-ca.crt.pem
