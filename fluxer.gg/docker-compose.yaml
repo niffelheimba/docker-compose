@@ -231,10 +231,6 @@ services:
       FLUXER_EDGE_TRUSTED_PROXIES: ${FLUXER_EDGE_TRUSTED_PROXIES:-private_ranges}
       FLUXER_EDGE_ENCODE: ${FLUXER_EDGE_ENCODE:-zstd gzip}
       FLUXER_ADMIN_BASE_PATH: ${FLUXER_ADMIN_BASE_PATH:-/admin}
-    networks:
-      fluxer:
-      traefik-net:
-        aliases: [fluxer-edge]
     configs:
       - source: fluxer-caddyfile
         target: /etc/caddy/Caddyfile
@@ -866,9 +862,6 @@ services:
       api: {condition: service_healthy}
 
 networks:
-  traefik-net:
-    external: true
-    name: ${TRAEFIK_NETWORK:-nl10-traefik_traefik-net}
   fluxer:
     driver: bridge
 

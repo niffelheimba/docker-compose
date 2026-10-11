@@ -14,21 +14,22 @@ Source: https://github.com/fluxerapp/fluxer/tree/7d2c51a57f4bdeeca5a716dfd96dc72
 2. Generate the environment on a Linux Docker host with
    `sh generate-env.sh > .env`, or fill the blanks in `.env.example` yourself.
    Paste the result into Arcane's project Environment editor. Keep `.env` private.
-3. Set `TRAEFIK_NETWORK` to the existing proxy network on the selected Arcane
-   host. The default follows the existing NL10 stacks:
-   `nl10-traefik_traefik-net`. Traefik and Fluxer must share the same Docker daemon
-   for this network route to work.
-4. In Traefik Manager, route host `chat.home.northlake.dev` to
-   `http://fluxer-edge:8080`, enable TLS with the existing certificate resolver,
-   and apply the normal private/home access policy. DNS must point to Traefik.
-   Docker labels will not work: this repository disables Traefik's Docker provider.
+3. `FLUXER_EDGE_BIND=10.10.60.148:18080` publishes the edge on Multi-02's LAN
+   address, for Traefik on ProxyAuth (`10.10.50.100`). Change the address if you
+   deploy Fluxer on a different host. No external Docker network is required.
+4. The live Traefik Manager configuration on ProxyAuth routes host
+   `chat.home.northlake.dev` to `http://10.10.60.148:18080`, with TLS using
+   the existing certificate resolver and the `private-net` access policy.
+   DNS must point to ProxyAuth. Traefik routing is managed at runtime, not by
+   Git synchronization; Docker labels will not work with its disabled Docker provider.
 5. Deploy. Complete the Fluxer initial setup and keep a local administrator account
    while testing SSO. Open `https://chat.home.northlake.dev/admin` to configure SSO.
 
-Only the edge joins the proxy network. Databases, object storage, queues, and
-application services stay on the private Fluxer network. The optional loopback
-edge port defaults to `127.0.0.1:18080`; a remote proxy requires a reachable bind
-address and a firewall rule allowing only that proxy.
+Only the edge and LiveKit media ports are published. Databases, object storage,
+queues, and application services stay on the private Fluxer network. Compose
+defaults to `127.0.0.1:18080` if `FLUXER_EDGE_BIND` is omitted; the environment
+template sets the LAN bind needed by ProxyAuth. Restrict inbound port 18080 to
+ProxyAuth in the host/network firewall.
 
 Compose must support `configs.content` and healthcheck `start_interval`
 (Docker Compose 2.23.1 or newer). Named volumes persist the data. Back up the
@@ -42,7 +43,7 @@ has not been started or deployed by this repository change.
 ## Environment values
 
 The hostname, HTTPS origin, and ports are already set in `.env.example`.
-Change the proxy network and notification email for your deployment.
+Check `FLUXER_EDGE_BIND` and the notification email for your deployment.
 The generator supplies all required application secrets:
 
 - `POSTGRES_PASSWORD`, `MEILI_MASTER_KEY`, `FLUXER_S3_SECRET_KEY`.
