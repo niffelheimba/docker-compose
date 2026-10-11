@@ -64,8 +64,14 @@ overlay/COMPOSE_FILE instructions do not apply to this combined compose file.
 Email is disabled by default. Enable SMTP only after setting a real sender and
 server credentials. Voice/video needs client reachability to the Docker host on
 TCP 7881 and UDP 7882, in addition to the proxied `/livekit` signaling endpoint.
-For LAN-only voice, set `FLUXER_LIVEKIT_NODE_IP` to the host's LAN address and
-`FLUXER_LIVEKIT_USE_EXTERNAL_IP=false` if public-IP discovery is unsuitable.
+For public and LAN voice, use `FLUXER_LIVEKIT_USE_EXTERNAL_IP=true`, forward WAN
+UDP 7882 and TCP 7881 to Multi-02 (`10.10.60.148`), and allow client VLAN traffic
+to those ports. UniFi NAT loopback lets LAN clients reach the advertised public
+media address; split DNS continues to route HTTPS signaling locally. HTTPS
+access to Traefik alone does not carry voice media. Public app access also needs
+the Fluxer Traefik route to permit public clients.
+For LAN-only voice, set `FLUXER_LIVEKIT_NODE_IP=10.10.60.148` and
+`FLUXER_LIVEKIT_USE_EXTERNAL_IP=false` instead.
 
 ## Kanidm and native SSO
 
