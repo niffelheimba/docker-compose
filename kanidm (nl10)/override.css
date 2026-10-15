@@ -1,0 +1,120 @@
+/* Northlake identity portal. Charcoal surfaces and neutral gray accents. */
+:root, [data-bs-theme="light"], [data-bs-theme="dark"] {
+  color-scheme: dark;
+  --bs-body-bg: #111214;
+  --bs-body-color: #f3f4f6;
+  --bs-emphasis-color: #ffffff;
+  --bs-secondary-color: #afb2ba;
+  --bs-tertiary-color: #9398a3;
+  --bs-secondary-bg: #202226;
+  --bs-tertiary-bg: #191b1f;
+  --bs-border-color: #34373e;
+  --bs-link-color: #d1d5db;
+  --bs-link-hover-color: #f3f4f6;
+  --bs-primary: #c2c6cf;
+  --bs-primary-rgb: 194, 198, 207;
+  --bs-link-color-rgb: 209, 213, 219;
+  --bs-link-hover-color-rgb: 243, 244, 246;
+  --bs-primary-text-emphasis: #e5e7eb;
+  --bs-primary-bg-subtle: #292c32;
+  --bs-primary-border-subtle: #555b66;
+  --bs-focus-ring-color: #c2c6cf33;
+
+}
+body {
+  background: radial-gradient(ellipse at 50% 0%, #252328 0, #151619 45%, #111214 100%);
+  color: var(--bs-body-color);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+main.form-signin {
+  width: min(440px, calc(100% - 32px));
+  max-width: 680px;
+  padding: 36px 36px 28px;
+  background: #1c1e22;
+  border: 1px solid #34373e;
+  border-radius: 18px;
+  box-shadow: 0 24px 80px #00000045;
+  flex-shrink: 0;
+}
+main.form-signin:has(.form-cred-reset-body) { width: min(600px, calc(100% - 32px)); }
+main.form-signin > div { width: 100%; }
+main.form-signin .kanidm_logo {
+  width: 108px;
+  height: 108px;
+  object-fit: contain;
+  margin-bottom: 18px;
+  border-radius: 20px;
+}
+main.form-signin > h3 {
+  font-size: 25px;
+  font-weight: 650;
+  letter-spacing: -0.6px;
+  margin-bottom: 28px;
+  color: #f9fafb;
+}
+.form-label { color: #e6e7eb; font-size: 14px; font-weight: 500; }
+.form-control, .form-select {
+  background-color: #14161a;
+  color: #f3f4f6;
+  border-color: #42464f;
+  border-radius: 8px;
+  min-height: 46px;
+}
+.form-control:focus, .form-select:focus {
+  background-color: #14161a;
+  color: #ffffff;
+  border-color: #c2c6cf;
+  box-shadow: 0 0 0 3px #c2c6cf33;
+}
+.form-control::placeholder { color: #9a9eaa; }
+.form-check-label { font-size: 13px; color: #b7bbc5; }
+.form-check-input { background-color: #333740; border-color: #646a76; }
+.form-check-input:checked { background-color: #c2c6cf; border-color: #c2c6cf; }
+.form-check-input:focus { border-color: #c2c6cf; box-shadow: 0 0 0 3px #c2c6cf33; }
+.btn { border-radius: 8px; font-weight: 600; padding: 10px 16px; }
+.btn-primary {
+  --bs-btn-color: #14161a;
+  --bs-btn-bg: #c2c6cf;
+  --bs-btn-border-color: #c2c6cf;
+  --bs-btn-hover-color: #14161a;
+  --bs-btn-hover-bg: #d7dae0;
+  --bs-btn-hover-border-color: #d7dae0;
+  --bs-btn-active-color: #14161a;
+  --bs-btn-active-bg: #a9afb9;
+  --bs-btn-active-border-color: #a9afb9;
+  --bs-btn-disabled-color: #14161a;
+  --bs-btn-disabled-bg: #c2c6cf;
+  --bs-btn-disabled-border-color: #c2c6cf;
+  --bs-btn-focus-shadow-rgb: 194, 198, 207;
+}
+main.form-signin .input-group > .btn:only-child { width: 100%; }
+main.form-signin #cred-form { display: flex; justify-content: center; }
+.btn-secondary, .btn-outline-secondary { --bs-btn-color: #e6e7eb; --bs-btn-border-color: #555b66; }
+a:focus-visible, button:focus-visible { outline: 2px solid #d1d5db; outline-offset: 3px; }
+.footer { background: transparent !important; font-size: 12px; }
+.footer .container { text-align: center; }
+.navbar { background-color: #1c1e22 !important; border-bottom: 1px solid #34373e; }
+.navbar, .navbar[data-bs-theme="light"], .navbar[data-bs-theme="dark"] {
+  --bs-navbar-color: #c2c6cf;
+  --bs-navbar-hover-color: #ffffff;
+  --bs-navbar-active-color: #ffffff;
+  --bs-navbar-brand-color: #ffffff;
+  --bs-navbar-brand-hover-color: #d1d5db;
+}
+.card { background: #1c1e22; border-color: #34373e; border-radius: 12px; overflow: hidden; }
+.card > a { background: #25282d; border-bottom: 1px solid #34373e; }
+.oauth2-img[alt="Frigate icon"] { filter: invert(1); }
+.oauth2-img[alt="Parseable icon"] { filter: brightness(0) invert(1); }
+.oauth2-img { object-fit: contain; padding: 20px; }
+.card .card-title { color: #f3f4f6; }
+.card:hover { border-color: #676d78; }
+#cred-update-commit-bar { background: #1c1e22; }
+@media (max-width: 480px) {
+  main.form-signin { padding: 28px 24px 24px; border-radius: 14px; margin-block: 24px !important; }
+  main.form-signin .kanidm_logo { width: 92px; height: 92px; }
+}
+@media (forced-colors: active) {
+  main.form-signin, .card, .form-control, .form-select { border: 1px solid CanvasText; }
+  a:focus-visible, button:focus-visible { outline-color: Highlight; }
+}

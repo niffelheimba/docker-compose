@@ -29,6 +29,7 @@ services:
       - ./server.toml:/data/server.toml:ro
       - ./data:/data
       - ./certs:/certs:ro
+      - ./override.css:/hpkg/override.css:ro
     networks:
       - traefik-net
 

@@ -1,0 +1,54 @@
+services:
+  backend:
+    image: ghcr.io/pouzor/homelable-backend:${HOMELABLE_VERSION:-latest}
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      SQLITE_PATH: /app/data/homelab.db
+    volumes:
+      - backend_data:/app/data
+    cap_add:
+      - NET_RAW
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+    networks:
+      - homelable
+
+  frontend:
+    image: ghcr.io/pouzor/homelable-frontend:${HOMELABLE_VERSION:-latest}
+    restart: unless-stopped
+    ports:
+      - "${HOMELABLE_BIND_IP:-0.0.0.0}:${HOMELABLE_PORT:-3010}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - homelable
+
+  mcp:
+    image: ghcr.io/pouzor/homelable-mcp:${HOMELABLE_VERSION:-latest}
+    profiles: ["mcp"]
+    restart: unless-stopped
+    environment:
+      BACKEND_URL: http://backend:8000
+      MCP_API_KEY: ${MCP_API_KEY:-}
+      MCP_SERVICE_KEY: ${MCP_SERVICE_KEY:-}
+    ports:
+      - "${MCP_BIND_IP:-127.0.0.1}:${MCP_PORT:-8001}:8001"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - homelable
+
+volumes:
+  backend_data:
+
+networks:
+  homelable:
+    driver: bridge
