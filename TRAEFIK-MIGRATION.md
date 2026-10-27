@@ -23,6 +23,23 @@ NL00's former Caddy routes are declared in
 networks previously used by Caddy. OpenBao and Semaphore explicitly join
 `caddy-net` so their Docker DNS names remain reachable.
 
+## Published application ports
+
+Uptime Kuma and Vaultwarden on NL00 have no host-published ports. Traefik
+reaches them through `uptime-net` and `vaultwarden-net` using the existing
+container addresses. Redeploy those application stacks to remove their old
+host listeners; the Traefik routes require no changes.
+
+Keep NL10's published backend ports where Traefik connects from another
+host. Removing those mappings would also remove the proxy's access. Frigate's
+go2rtc port 1984 remains published pending confirmation of its consumers.
+
+The client-to-server UniFi restriction covers destination ports 80 and 443,
+with the admin devices and proxy HTTPS route allowed first. It does not block
+direct access to applications on other published ports, or traffic within
+one VLAN. Restrict remote backend listeners to their intended proxy or
+integration clients separately when stronger isolation is required.
+
 ## Traefik Manager ownership
 
 Arcane/Git remains authoritative for Compose infrastructure, images, networks,

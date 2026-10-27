@@ -6,8 +6,7 @@ services:
       - ./data:/app/data
       - ./entrypoint.sh:/entrypoint.sh:ro
       - ./hosts:/etc/hosts:ro
-    ports:
-      - "3001:3001"
+    # Traefik reaches port 3001 over uptime-net; no host port is needed.
     networks:
       uptime-net:
     dns:

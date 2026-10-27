@@ -7,8 +7,7 @@ services:
       - .env
     volumes:
       - ./vw-data/:/data/
-    ports:
-      - 127.0.0.1:8000:80
+    # Traefik reaches port 80 over vaultwarden-net; no host port is needed.
     networks:
       - vaultwarden-net
 
