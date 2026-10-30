@@ -18,12 +18,20 @@ these local binary sizes are indicative, not a measurement of that final image.
 
 ## Compose integration
 
-Both Traefik Compose files build the same source from `../traefik-error-pages`.
-Keep this sibling folder alongside each stack on its Docker build host (or build
-and distribute the image separately before deployment). An Arcane sync that only
-copies the stack folder must also copy the shared source folder; do not deploy a
-stack with a missing build context. Builds are native to the host architecture,
-including ARM64 on NL00 and AMD64 on NL10. No image has been published.
+Both Traefik Compose files build from their own `./error-pages` subdirectory.
+Each project is self-contained for Arcane's project-scoped Git sync; no sibling
+folder is needed on the deployment host. Builds are native to the host
+architecture, including ARM64 on NL00 and AMD64 on NL10. No image has been published.
+
+This folder is the canonical source. Its Dockerfile, `.dockerignore`, `go.mod`,
+`main.go`, `main_test.go` and `error.html` are copied into each stack's
+`error-pages/` folder. When changing the renderer, update both copies and verify
+they match before committing. These copies deliberately avoid symlinks and
+external build contexts so Arcane can deploy either project independently.
+
+If Arcane previously reported a missing `/home/service/docker-compose/traefik-error-pages`
+context, sync the latest Git revision before redeploying. The Compose build
+context should now resolve inside the selected project folder.
 
 Only Traefik and `error-pages` join each stack's new `internal` bridge network.
 The renderer has no published ports, host mounts, Docker socket, Linux

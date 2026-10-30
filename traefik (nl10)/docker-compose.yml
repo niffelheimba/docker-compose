@@ -42,7 +42,7 @@ services:
 
   error-pages:
     build:
-      context: ../traefik-error-pages
+      context: ./error-pages
     image: northlake/error-pages:1.0.0
     restart: unless-stopped
     user: "65532:65532"
