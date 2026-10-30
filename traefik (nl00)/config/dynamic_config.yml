@@ -15,6 +15,7 @@ http:
         - websecure
       service: status
       middlewares:
+        - northlake-errors@file
         - private-net
       priority: 10
       tls:
@@ -52,6 +53,7 @@ http:
         - websecure
       service: semaphore
       middlewares:
+        - northlake-errors@file
         - private-net
       tls:
         certResolver: letsencrypt
@@ -62,6 +64,7 @@ http:
         - websecure
       service: arcane
       middlewares:
+        - northlake-errors@file
         - private-net
       tls:
         certResolver: letsencrypt

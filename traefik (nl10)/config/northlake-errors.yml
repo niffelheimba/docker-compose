@@ -1,0 +1,49 @@
+# Import into Manager's runtime configuration; Git's config/ is seed-only.
+http:
+  routers:
+    northlake-not-found:
+      rule: 'HostRegexp(`^([a-z0-9-]+\.)?northlake\.dev$`) || HostRegexp(`^([a-z0-9-]+\.)?home\.northlake\.dev$`)'
+      priority: 1
+      entryPoints:
+        - websecure
+      middlewares:
+        - northlake-not-found-path
+      service: northlake-error-pages
+      tls:
+        certResolver: letsencrypt
+        domains:
+          - main: northlake.dev
+            sans:
+              - '*.northlake.dev'
+          - main: home.northlake.dev
+            sans:
+              - '*.home.northlake.dev'
+
+  middlewares:
+    northlake-not-found-path:
+      replacePath:
+        path: /errors/404
+    northlake-errors:
+      errors:
+        status:
+          - '403'
+          - '500-599'
+        service: northlake-error-pages
+        query: /errors/{status}
+        errorRequestHeaders: []
+    # Opt in separately: many applications need their own 404 responses.
+    northlake-errors-with-404:
+      errors:
+        status:
+          - '403-404'
+          - '500-599'
+        service: northlake-error-pages
+        query: /errors/{status}
+        errorRequestHeaders: []
+
+  services:
+    northlake-error-pages:
+      loadBalancer:
+        passHostHeader: false
+        servers:
+          - url: http://error-pages:8080

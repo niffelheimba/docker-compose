@@ -46,6 +46,27 @@ services:
       - arcane-net
       - semaphore-net
       - traefik-manager-net
+      - error-pages-net
+
+  error-pages:
+    build:
+      context: ../traefik-error-pages
+    image: northlake/error-pages:1.0.0
+    restart: unless-stopped
+    user: "65532:65532"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 32
+    mem_limit: 64m
+    cpus: 0.25
+    environment:
+      GOMEMLIMIT: 32MiB
+      GOMAXPROCS: "1"
+    networks:
+      - error-pages-net
 
   traefik-manager:
     # Upstream currently publishes the ARM64-compatible Docker image as latest;
@@ -75,6 +96,8 @@ services:
       - traefik-manager-net
 
 networks:
+  error-pages-net:
+    internal: true
   uptime-net:
     external: true
   kanidm-net:

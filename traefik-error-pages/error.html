@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{{.Code}} {{.Title}} · Northlake</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #30343b; background: #f5f5f5; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; min-height: 100svh; display: grid; place-items: center; padding: 24px; }
+    main { width: 100%; max-width: 560px; text-align: center; }
+    .card { background: #fff; border: 1px solid #e9e9ec; border-radius: 8px; padding: 40px 24px; box-shadow: 0 4px 18px #00000008; }
+    .code { margin: 0; font-size: clamp(88px, 22vw, 160px); font-weight: 600; line-height: 1.1; letter-spacing: -.06em; }
+    h1 { margin: 16px 0; font-size: clamp(24px, 5vw, 32px); font-weight: 400; }
+    p { margin: 0; color: #626873; font-size: 16px; line-height: 1.6; }
+    footer { margin-top: 24px; color: #757b85; font-size: 13px; letter-spacing: .04em; }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card" aria-labelledby="title">
+      <p class="code">{{.Code}}</p>
+      <h1 id="title">{{.Title}}</h1>
+      <p>{{.Message}}</p>
+    </section>
+    <footer>Northlake</footer>
+  </main>
+</body>
+</html>

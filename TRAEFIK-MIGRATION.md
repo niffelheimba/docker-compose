@@ -65,6 +65,12 @@ definitions, which Traefik Manager can import/adopt.
 
 ## Deployment
 
+Custom error pages and unknown-host fallbacks are prepared in
+`traefik-error-pages/README.md`. Both Compose stacks build the shared shell-free
+renderer. Import each `config/northlake-errors.yml` through Manager separately;
+Git seed-route changes do not update live routes. Verify wildcard DNS and TLS
+before expecting a browser to display the fallback page.
+
 1. Seed the two runtime config directories as described above, before changing
    the bind mounts.
 2. Add the new `TMA_*` values to each deployed Arcane environment. Set the

@@ -55,6 +55,7 @@ http:
         - websecure
       service: homeassistant-home
       middlewares:
+        - northlake-errors@file
         - private-net
       tls:
         certResolver: letsencrypt
@@ -81,6 +82,7 @@ http:
         - websecure
       service: watch
       middlewares:
+        - northlake-errors@file
         - private-net
       tls:
         certResolver: letsencrypt
@@ -123,6 +125,7 @@ http:
         - websecure
       service: pve1
       middlewares:
+        - northlake-errors@file
         - private-net
       tls:
         certResolver: letsencrypt
@@ -133,6 +136,7 @@ http:
         - websecure
       service: pve2
       middlewares:
+        - northlake-errors@file
         - private-net
       tls:
         certResolver: letsencrypt
@@ -143,6 +147,7 @@ http:
         - websecure
       service: truenas
       middlewares:
+        - northlake-errors@file
         - private-net
       tls:
         certResolver: letsencrypt
@@ -181,6 +186,7 @@ http:
         - websecure
       service: amp
       middlewares:
+        - northlake-errors@file
         - private-net
       tls:
         certResolver: letsencrypt
@@ -191,6 +197,7 @@ http:
         - websecure
       service: grafana
       middlewares:
+        - northlake-errors@file
         - private-net
       tls:
         certResolver: letsencrypt
