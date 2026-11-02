@@ -19,6 +19,9 @@ Deployable stacks are organized by application, then location. `nl00` is cloud;
 | Shared error-page source | `traefik-error-pages/` |
 | Stopped Fluxer / historical templates | `fluxer.gg/`, `archive/` (unchanged) |
 
+Verified Compose variants declare their deployed project names explicitly, so
+leaf directories such as `nl00` do not become a shared default project name.
+
 Keep each deployment's local `.env`, volumes and project name when changing a
 repository path. Relative bind mounts remain relative to that variant's Compose
 directory. Moving Git source does not authorize moving live data.

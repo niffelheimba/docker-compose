@@ -1,3 +1,5 @@
+name: karakeep
+
 services:
   web:
     image: ghcr.io/karakeep-app/karakeep:latest@sha256:170bac0af0edba232b491f214eae50cf084e1bb465463922b0f8053dd4615226

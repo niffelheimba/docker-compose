@@ -1,3 +1,5 @@
+name: kanidm
+
 services:
   certdumper:
     image: ghcr.io/kereis/traefik-certs-dumper:1.8.32@sha256:9b0d30ed3eefa8b2442fdbe7f3074591ee67b730e111946240fcd443e37e464d

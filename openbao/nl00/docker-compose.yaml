@@ -1,3 +1,5 @@
+name: openbao
+
 services:
   openbao:
     # v2.7 removed the legacy file storage backend used by this deployment.

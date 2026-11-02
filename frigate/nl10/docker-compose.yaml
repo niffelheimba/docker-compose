@@ -1,3 +1,5 @@
+name: frigate
+
 services:
   frigate:
     container_name: frigate

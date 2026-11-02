@@ -1,3 +1,5 @@
+name: cloudflare-ddns
+
 version: '3.9'
 services:
   cloudflare-ddns:

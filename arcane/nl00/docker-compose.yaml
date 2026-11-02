@@ -1,3 +1,5 @@
+name: arcane
+
 services:
   arcane:
     image: ghcr.io/getarcaneapp/arcane:v2.17.2@sha256:ec8417998df367cc2eb6efdfbe9b9607a42ad04b78d1c185ccc5f9f7d943019e

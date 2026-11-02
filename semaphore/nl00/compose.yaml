@@ -1,3 +1,5 @@
+name: semaphore
+
 services:
   mysql:
     restart: unless-stopped

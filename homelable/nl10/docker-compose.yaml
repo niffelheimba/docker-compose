@@ -1,3 +1,5 @@
+name: homelable
+
 services:
   backend:
     image: ghcr.io/pouzor/homelable-backend:latest@sha256:0c682daec42f57e8a2f74671901373d7e8513b85a434235b524a36772da2e93c
