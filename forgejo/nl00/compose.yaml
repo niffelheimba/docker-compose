@@ -1,0 +1,37 @@
+name: forgejo
+
+services:
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:17.0.1-rootless@sha256:5ef02fbcf22beef56b8c844952ffad58cfe177b6f98e46e6abb5df90b88dc8d3
+    container_name: forgejo
+    user: "1000:1000"
+    restart: unless-stopped
+    environment:
+      TZ: America/New_York
+      FORGEJO__database__DB_TYPE: sqlite3
+      FORGEJO__database__PATH: /var/lib/gitea/data/forgejo.db
+      FORGEJO__server__DOMAIN: ${FORGEJO_DOMAIN:-git.cloud.northlake.dev}
+      FORGEJO__server__ROOT_URL: ${FORGEJO_ROOT_URL:-https://git.cloud.northlake.dev/}
+      FORGEJO__server__HTTP_PORT: "3000"
+      FORGEJO__server__SSH_DOMAIN: ${FORGEJO_DOMAIN:-git.cloud.northlake.dev}
+      FORGEJO__server__SSH_PORT: ${FORGEJO_SSH_PORT:-2222}
+      FORGEJO__server__SSH_LISTEN_PORT: "2222"
+      FORGEJO__server__START_SSH_SERVER: "true"
+      FORGEJO__service__DISABLE_REGISTRATION: "true"
+      FORGEJO__service__REQUIRE_SIGNIN_VIEW: "true"
+    ports:
+      - "${FORGEJO_HTTP_BIND_IP:-127.0.0.1}:${FORGEJO_HTTP_PORT:-3030}:3000"
+      - "${FORGEJO_SSH_BIND_IP:-127.0.0.1}:${FORGEJO_SSH_PORT:-2222}:2222"
+    volumes:
+      # Includes repositories, SQLite, app.ini, keys and other Forgejo state.
+      - forgejo-data:/var/lib/gitea
+    networks:
+      - proxy
+
+volumes:
+  forgejo-data:
+
+networks:
+  proxy:
+    external: true
+    name: ${FORGEJO_PROXY_NETWORK:-arcane-net}

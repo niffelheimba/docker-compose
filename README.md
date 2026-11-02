@@ -11,6 +11,7 @@ Deployable stacks are organized by application, then location. `nl00` is cloud;
 | Alloy | `alloy/nl00/`, `alloy/nl10/multi/`, `alloy/nl10/proxyauth/` |
 | Kanidm | `kanidm/nl00/`, `kanidm/nl10/` |
 | Traefik | `traefik/nl00/`, `traefik/nl10/` |
+| Forgejo starter | `forgejo/nl00/` (not deployed) |
 | Arcane manager | `arcane/nl00/` |
 | Cloudflare DDNS, Frigate, Homelable, Karakeep, OAuth2 Proxy | each application’s `nl10/` directory |
 | Grafana and Loki stack | `observability/nl10/` |
