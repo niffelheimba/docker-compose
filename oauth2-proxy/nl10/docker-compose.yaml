@@ -1,0 +1,22 @@
+services:
+  frigate-oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.15.0@sha256:d963570b1f7e399bc42caace45433aab09e7ae76de5610fde97ba32029b6150a
+    container_name: frigate-oauth2-proxy
+    restart: unless-stopped
+    env_file:
+      - .env
+    networks:
+      - default
+      - traefik-net
+  redis:
+    image: redis:7.4.11-alpine@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499
+    container_name: frigate-oauth2-redis
+    restart: unless-stopped
+    networks:
+      - default
+      - traefik-net
+
+networks:
+  traefik-net:
+    external: true
+    name: nl10-traefik_traefik-net

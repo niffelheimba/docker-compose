@@ -1,0 +1,31 @@
+services:
+  alloy:
+    image: grafana/alloy:v1.21.0@sha256:9726bfba078de9bc2212c60c6e643238c700b4fe0868ea78cbe03163d03d95bf
+    container_name: alloy
+    restart: unless-stopped
+    command:
+      - run
+      # CEF is not guaranteed to use RFC3164/RFC5424 framing.  The dedicated
+      # listener therefore uses Alloy's experimental raw syslog format.
+      - --stability.level=experimental
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+    environment:
+      HOST_NAME: ${HOST_NAME:?Set HOST_NAME in Arcane}
+      LOKI_URL: ${LOKI_URL:?Set LOKI_URL in Arcane}
+    volumes:
+      - ./config/config.alloy:/etc/alloy/config.alloy:ro
+      - alloy-data:/var/lib/alloy/data
+      - ${DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock:ro
+      - /var/log/journal:/var/log/journal:ro
+      - /run/log/journal:/run/log/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
+    ports:
+      # UniFi SIEM/CEF receiver. Both transports use the same destination
+      # port so this also works with UniFi releases whose SIEM UI does not
+      # expose a transport selector.
+      - "1514:1514/tcp"
+      - "1514:1514/udp"
+
+volumes:
+  alloy-data:

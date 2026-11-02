@@ -19,7 +19,7 @@ existing `nl10-traefik_traefik-net` network with Traefik.
 ## NL00
 
 NL00's former Caddy routes are declared in
-`traefik (nl00)/config/dynamic_config.yml`. Traefik joins the same external
+`traefik/nl00/config/dynamic_config.yml`. Traefik joins the same external
 networks previously used by Caddy. OpenBao and Semaphore explicitly join
 `caddy-net` so their Docker DNS names remain reachable.
 

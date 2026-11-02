@@ -1,0 +1,224 @@
+{
+  "observed_date": "2026-11-01",
+  "timezone": "America/New_York",
+  "scope": "Exact deployed image artifacts; no deployments",
+  "image_pins": [
+    {
+      "compose_file": "actual-budget/nl10/family/docker-compose.yaml",
+      "previous_image": "docker.io/actualbudget/actual-server:latest",
+      "pinned_image": "docker.io/actualbudget/actual-server:26.10.0@sha256:24645e971da6bb1a1f953d6859e307a0b29be1e8b4130a35b3220c209b5b860c",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "actual-budget/nl10/jacob/docker-compose.yaml",
+      "previous_image": "docker.io/actualbudget/actual-server:latest",
+      "pinned_image": "docker.io/actualbudget/actual-server:26.10.0@sha256:24645e971da6bb1a1f953d6859e307a0b29be1e8b4130a35b3220c209b5b860c",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "actual-budget/nl10/nicholas/docker-compose.yaml",
+      "previous_image": "docker.io/actualbudget/actual-server:latest",
+      "pinned_image": "docker.io/actualbudget/actual-server:26.10.0@sha256:24645e971da6bb1a1f953d6859e307a0b29be1e8b4130a35b3220c209b5b860c",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "alloy/nl10/multi/compose.yaml",
+      "previous_image": "grafana/alloy:latest",
+      "pinned_image": "grafana/alloy:v1.21.0@sha256:9726bfba078de9bc2212c60c6e643238c700b4fe0868ea78cbe03163d03d95bf",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "arcane/nl00/docker-compose.yaml",
+      "previous_image": "ghcr.io/getarcaneapp/arcane:latest",
+      "pinned_image": "ghcr.io/getarcaneapp/arcane:v2.17.2@sha256:ec8417998df367cc2eb6efdfbe9b9607a42ad04b78d1c185ccc5f9f7d943019e",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "cloudflare-ddns/nl10/compose.yaml",
+      "previous_image": "timothyjmiller/cloudflare-ddns:latest",
+      "pinned_image": "timothyjmiller/cloudflare-ddns:2.3.0@sha256:4f347f975c59eef1d993ba1e433ac56a0dfb80a44b5168214ca115fe50187eda",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "frigate/nl10/docker-compose.yaml",
+      "previous_image": "ghcr.io/blakeblackshear/frigate:0.18.1",
+      "pinned_image": "ghcr.io/blakeblackshear/frigate:0.18.1@sha256:ae4ee2505e4dba6313b02bf5e8eea6c35fb1119f7087b9f684082be0a9fa0a71",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "homelable/nl10/docker-compose.yaml",
+      "previous_image": "ghcr.io/pouzor/homelable-backend:${HOMELABLE_VERSION:-latest}",
+      "pinned_image": "ghcr.io/pouzor/homelable-backend:latest@sha256:0c682daec42f57e8a2f74671901373d7e8513b85a434235b524a36772da2e93c",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "homelable/nl10/docker-compose.yaml",
+      "previous_image": "ghcr.io/pouzor/homelable-frontend:${HOMELABLE_VERSION:-latest}",
+      "pinned_image": "ghcr.io/pouzor/homelable-frontend:latest@sha256:21456d46ce88fd443140ebe15cd83bfb57a0fd8d449d622ac3ad16a9663cbf7c",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "kanidm/nl00/docker-compose.yaml",
+      "previous_image": "kanidm/server:1.12.0",
+      "pinned_image": "kanidm/server:1.12.0@sha256:71b6ff5a9c9c32b632894d8acef5a2afc77941b35a0aa95dcee959fe688d5ce9",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "kanidm/nl10/docker-compose.yaml",
+      "previous_image": "ghcr.io/kereis/traefik-certs-dumper:latest",
+      "pinned_image": "ghcr.io/kereis/traefik-certs-dumper:1.8.32@sha256:9b0d30ed3eefa8b2442fdbe7f3074591ee67b730e111946240fcd443e37e464d",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "kanidm/nl10/docker-compose.yaml",
+      "previous_image": "docker.io/kanidm/server:1.12.0",
+      "pinned_image": "docker.io/kanidm/server:1.12.0@sha256:71b6ff5a9c9c32b632894d8acef5a2afc77941b35a0aa95dcee959fe688d5ce9",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "karakeep/nl10/docker-compose.yaml",
+      "previous_image": "ghcr.io/karakeep-app/karakeep:${KARAKEEP_VERSION:-release}",
+      "pinned_image": "ghcr.io/karakeep-app/karakeep:latest@sha256:170bac0af0edba232b491f214eae50cf084e1bb465463922b0f8053dd4615226",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "karakeep/nl10/docker-compose.yaml",
+      "previous_image": "zenika/alpine-chrome:124",
+      "pinned_image": "zenika/alpine-chrome:124@sha256:eb3378c1ed0079f94db054a5fe1aaa790a254ec0d6bbc67eda052420d86a179d",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "karakeep/nl10/docker-compose.yaml",
+      "previous_image": "getmeili/meilisearch:v1.13.3",
+      "pinned_image": "getmeili/meilisearch:v1.13.3@sha256:bed3fb650e62da53145777204891159242f6ea4ce69e215b36223af4aa64a0ae",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "oauth2-proxy/nl10/docker-compose.yaml",
+      "previous_image": "quay.io/oauth2-proxy/oauth2-proxy:v7.15.0",
+      "pinned_image": "quay.io/oauth2-proxy/oauth2-proxy:v7.15.0@sha256:d963570b1f7e399bc42caace45433aab09e7ae76de5610fde97ba32029b6150a",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "oauth2-proxy/nl10/docker-compose.yaml",
+      "previous_image": "redis:7-alpine",
+      "pinned_image": "redis:7.4.11-alpine@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "observability/nl10/compose.yaml",
+      "previous_image": "grafana/grafana:latest",
+      "pinned_image": "grafana/grafana:13.2.4@sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "observability/nl10/compose.yaml",
+      "previous_image": "grafana/loki:3.7.0",
+      "pinned_image": "grafana/loki:3.7.0@sha256:c316b7c7589a5eeca843b6926c7446149d18300b79ac8538dc4ae063bc478da2",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "openbao/nl00/docker-compose.yaml",
+      "previous_image": "docker.io/openbao/openbao:2.6.4",
+      "pinned_image": "docker.io/openbao/openbao:2.6.4@sha256:cf2340fc9a22cb9358ca0defd1f39b65673836bd23fe2bb8984a07e11fe13ef4",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "semaphore/nl00/compose.yaml",
+      "previous_image": "mysql:8.0",
+      "pinned_image": "mysql:8.0.46@sha256:7dcddc01f13bab2f15cde676d44d01f61fc9f99fe7785e86196dfc07d358ae2b",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "semaphore/nl00/compose.yaml",
+      "previous_image": "semaphoreui/semaphore:latest",
+      "pinned_image": "semaphoreui/semaphore:v2.19.17@sha256:008dacd9f1adbd92e8a048f1786ae1dd9bed2a352aca2eb30b9837de5706e7f7",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "traefik/nl00/compose.yaml",
+      "previous_image": "traefik:v3.7.1",
+      "pinned_image": "traefik:v3.7.1@sha256:6b9cbca6fac42ab0075f5437d8dc1685cfd188626d8d515839ea94f8b6271c42",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "traefik/nl00/compose.yaml",
+      "previous_image": "ghcr.io/chr0nzz/traefik-manager:latest",
+      "pinned_image": "ghcr.io/chr0nzz/traefik-manager:1.15.4@sha256:db016c04be30b76afbf259c5ca4c3667d861805404bc2d572f9ad326e5bf96c1",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "traefik/nl10/docker-compose.yml",
+      "previous_image": "traefik:v3.7.1",
+      "pinned_image": "traefik:v3.7.1@sha256:6b9cbca6fac42ab0075f5437d8dc1685cfd188626d8d515839ea94f8b6271c42",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "traefik/nl10/docker-compose.yml",
+      "previous_image": "ghcr.io/chr0nzz/traefik-manager-agent:latest",
+      "pinned_image": "ghcr.io/chr0nzz/traefik-manager-agent:1.15.4@sha256:ed28df6a4f5434b4d8994de03aa9dd14c9f39e17f32e93c1d1bf264312b39a31",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "uptime-kuma/nl00/docker-compose.yaml",
+      "previous_image": "louislam/uptime-kuma:2",
+      "pinned_image": "louislam/uptime-kuma:2.5.6@sha256:9912da7d7d9b6ddc0c2d904beb84d24689c1ed9c33b81419eb9008663a92a329",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "vaultwarden/nl00/docker-compose.yaml",
+      "previous_image": "vaultwarden/server:latest",
+      "pinned_image": "vaultwarden/server:1.37.4@sha256:efb3cde962015fcc036b2ea625242248611943b27212ebf4392841fb30fad055",
+      "evidence": "Deployed container image digest; release tag verified where published"
+    },
+    {
+      "compose_file": "alloy/nl00/compose.yaml",
+      "pinned_image": "grafana/alloy:v1.21.0@sha256:9726bfba078de9bc2212c60c6e643238c700b4fe0868ea78cbe03163d03d95bf",
+      "evidence": "cloud1 Alloy binary v1.21.0 and deployed multi-platform digest"
+    },
+    {
+      "compose_file": "alloy/nl10/proxyauth/compose.yaml",
+      "pinned_image": "grafana/alloy:v1.20.1@sha256:2aa2099af76c0098d4af7a4d6e48f86cb66dc1a000222ad927a1c67c6542d13f",
+      "evidence": "home ProxyAuth Alloy binary v1.20.1 and deployed digest"
+    }
+  ],
+  "exceptions": [
+    {
+      "path": "archive/**",
+      "reason": "User requested unchanged; no current deployment evidence"
+    },
+    {
+      "path": "fluxer.gg/**",
+      "reason": "VM intentionally stopped; no verified image inventory; user requested unchanged"
+    },
+    {
+      "path": "parseable/nl10/compose.yaml",
+      "reason": "No Parseable container on reachable inventoried hosts; image declaration preserved"
+    },
+    {
+      "path": "homelable/nl10/docker-compose.yaml#mcp",
+      "reason": "Optional MCP profile not deployed; version-variable declaration preserved"
+    },
+    {
+      "path": "traefik/nl00/compose.yaml#error-pages",
+      "reason": "Locally built northlake/error-pages:1.0.0, no published RepoDigest; existing exact build version retained"
+    },
+    {
+      "path": "traefik/nl10/docker-compose.yml#error-pages",
+      "reason": "Locally built northlake/error-pages:1.0.0; existing exact build version retained"
+    },
+    {
+      "path": "**/Dockerfile",
+      "reason": "Existing exact golang:1.27.3-alpine builder and scratch runtime retained"
+    }
+  ],
+  "outside_repository_inventory": [
+    "Arcane agents (AMP v2.17.1; other reachable agents v2.17.2) have no matching source Compose files in this repository",
+    "Cloud-2 NetBird deployment has no source Compose file in this repository"
+  ],
+  "notes": [
+    "Nightly Karakeep and main-branch Homelable are frozen by deployed digest, not relabeled as stable releases.",
+    "Alloy image OCI version=24.04 is the base OS label, not its application version.",
+    "Cloudflare DDNS and Redis version tags currently have a different manifest from the deployed image; retained the observed deployed digest to avoid changing artifacts."
+  ]
+}

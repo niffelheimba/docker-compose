@@ -1,0 +1,32 @@
+services:
+  kanidm:
+    image: kanidm/server:1.12.0@sha256:71b6ff5a9c9c32b632894d8acef5a2afc77941b35a0aa95dcee959fe688d5ce9
+    container_name: kanidm
+    restart: unless-stopped
+
+    user: "1003:1003"
+
+    env_file:
+      - .env
+
+    ports:
+      - "8444:8444"
+
+    volumes:
+      - kanidm_data:/data
+      - /home/docker-secure/docker-compose/KanIDM/server.toml:/server.toml:ro
+      - /home/docker-secure/docker-compose/KanIDM/internal-certs/kanidm:/internal-certs:ro
+      - /home/docker-secure/certs:/certs:ro
+      - /home/docker-secure/docker-compose/KanIDM/app_logos:/app_logos:ro
+      - /home/docker-secure/docker-compose/KanIDM/override.css:/hpkg/override.css:ro
+
+    networks:
+      - kanidm-net
+
+networks:
+  kanidm-net:
+    external: true
+
+volumes:
+  kanidm_data:
+    external: true

@@ -1,0 +1,24 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2.5.6@sha256:9912da7d7d9b6ddc0c2d904beb84d24689c1ed9c33b81419eb9008663a92a329
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+      - ./entrypoint.sh:/entrypoint.sh:ro
+      - ./hosts:/etc/hosts:ro
+    # Traefik reaches port 3001 over uptime-net; no host port is needed.
+    networks:
+      uptime-net:
+    dns:
+      - 10.10.10.1      
+      - 1.1.1.1         
+      - 9.9.9.9         
+    cap_add:
+      - NET_ADMIN
+    entrypoint: /entrypoint.sh
+    command: 
+      - npm
+      - start
+networks:
+  uptime-net:
+    external: true

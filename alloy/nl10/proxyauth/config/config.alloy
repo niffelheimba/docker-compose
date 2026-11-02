@@ -1,0 +1,203 @@
+discovery.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+discovery.relabel "docker" {
+  targets = discovery.docker.containers.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_project"]
+    target_label  = "compose_project"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_image"]
+    target_label  = "image"
+  }
+}
+
+loki.source.docker "containers" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.relabel.docker.output
+  forward_to = [loki.write.central.receiver]
+
+  labels = {
+    host   = sys.env("HOST_NAME"),
+    source = "docker",
+  }
+}
+
+loki.relabel "journal" {
+  forward_to = [loki.write.central.receiver]
+
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+
+  rule {
+    source_labels = ["__journal_priority_keyword"]
+    target_label  = "priority"
+  }
+
+  rule {
+    source_labels = ["__journal_syslog_identifier"]
+    target_label  = "syslog_identifier"
+  }
+}
+
+loki.source.journal "host" {
+  forward_to = [loki.relabel.journal.receiver]
+  max_age    = "24h"
+
+  labels = {
+    host   = sys.env("HOST_NAME"),
+    source = "journal",
+  }
+}
+
+// UniFi emits CEF directly, rather than consistently wrapping it in an RFC3164
+// or RFC5424 syslog envelope. Keep the original event as the log line, extract
+// the stable CEF dimensions as labels, and retain identifiers/network details
+// as structured metadata instead of creating one Loki stream per value.
+loki.process "unifi_cef" {
+  forward_to = [loki.write.central.receiver]
+
+  stage.static_labels {
+    values = {
+      job    = "unifi",
+      site   = "nl10",
+      source = "siem",
+    }
+  }
+
+  // CEF:Version|Vendor|Product|DeviceVersion|EventClassID|Name|Severity|Extension
+  stage.regex {
+    // UniFi may prepend a syslog-style header before the CEF body even when
+    // sent as raw CEF. Match the CEF prefix wherever it begins on the line.
+    expression = "^.*?CEF:(?P<cef_version>[^|]*)\\|(?P<device_vendor>[^|]*)\\|(?P<device_product>[^|]*)\\|(?P<device_version>[^|]*)\\|(?P<event_id>[^|]*)\\|(?P<event_type>[^|]*)\\|(?P<severity>[^|]*)\\|(?P<cef_extension>.*)$"
+  }
+
+  // These extension values are simple tokens in CEF. More complex CEF values
+  // (for example msg= values containing spaces) remain safely available in the
+  // original log line instead of being incorrectly split.
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)act=(?P<action>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)src=(?P<src_ip>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)dst=(?P<dst_ip>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)spt=(?P<src_port>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)dpt=(?P<dst_port>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)smac=(?P<src_mac>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)dmac=(?P<dst_mac>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)suser=(?P<username>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)UNIFIdeviceIp=(?P<unifi_device_ip>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)UNIFIdeviceMac=(?P<unifi_device_mac>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)UNIFIdeviceModel=(?P<unifi_device_model>[^\\s]+)"
+  }
+  stage.regex {
+    source     = "cef_extension"
+    expression = "(?:^|\\s)UNIFIdeviceVersion=(?P<unifi_device_version>[^\\s]+)"
+  }
+
+  // Ensure events without CEF's optional act= extension stay in one bounded
+  // action label value rather than gaining a dynamic fallback.
+  stage.template {
+    source   = "action"
+    template = "{{ if .Value }}{{ ToLower .Value }}{{ else }}unknown{{ end }}"
+  }
+
+  stage.labels {
+    values = {
+      severity   = "",
+      event_type = "",
+      action     = "",
+    }
+  }
+
+  stage.structured_metadata {
+    values = {
+      cef_version    = "",
+      device_vendor  = "",
+      device_product = "",
+      device_version = "",
+      event_id       = "",
+      src_ip         = "",
+      dst_ip         = "",
+      src_port       = "",
+      dst_port       = "",
+      src_mac        = "",
+      dst_mac        = "",
+      username       = "",
+      unifi_device_ip      = "",
+      unifi_device_mac     = "",
+      unifi_device_model   = "",
+      unifi_device_version = "",
+    }
+  }
+}
+
+// Listen on both transports. Prefer TCP in UniFi when the UI offers it; the
+// UDP listener is intentional compatibility for versions exposing only IP/port.
+loki.source.syslog "unifi_cef" {
+  listener {
+    address       = "0.0.0.0:1514"
+    protocol      = "tcp"
+    syslog_format = "raw"
+  }
+
+  listener {
+    address       = "0.0.0.0:1514"
+    protocol      = "udp"
+    syslog_format = "raw"
+  }
+
+  forward_to = [loki.process.unifi_cef.receiver]
+}
+
+loki.write "central" {
+  endpoint {
+    url = sys.env("LOKI_URL")
+  }
+}

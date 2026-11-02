@@ -1,0 +1,30 @@
+services:
+  mysql:
+    restart: unless-stopped
+    image: mysql:8.0.46@sha256:7dcddc01f13bab2f15cde676d44d01f61fc9f99fe7785e86196dfc07d358ae2b
+    hostname: mysql
+    volumes:
+      - semaphore-mysql:/var/lib/mysql
+    env_file:
+      - .env
+    networks:
+      - default
+      - caddy-net
+
+  semaphore:
+    restart: unless-stopped
+    image: semaphoreui/semaphore:v2.19.17@sha256:008dacd9f1adbd92e8a048f1786ae1dd9bed2a352aca2eb30b9837de5706e7f7
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+    networks:
+      - default
+
+volumes:
+  semaphore-mysql:
+    name: semaphore_semaphore-mysql
+
+networks:
+  caddy-net:
+    external: true

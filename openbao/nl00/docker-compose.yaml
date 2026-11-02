@@ -1,0 +1,48 @@
+services:
+  openbao:
+    # v2.7 removed the legacy file storage backend used by this deployment.
+    # Keep this on the maintained 2.6 release line until the data is migrated.
+    image: docker.io/openbao/openbao:2.6.4@sha256:cf2340fc9a22cb9358ca0defd1f39b65673836bd23fe2bb8984a07e11fe13ef4
+    container_name: openbao
+    restart: unless-stopped
+
+    cap_add:
+      - IPC_LOCK
+
+    command: server
+
+#    ports:
+#      - "8200:8200"
+
+    environment:
+      BAO_LOCAL_CONFIG: |
+        ui = true
+
+        storage "file" {
+          path = "/openbao/data"
+        }
+
+        listener "tcp" {
+          address     = "0.0.0.0:8200"
+          tls_disable = 1
+        }
+
+        api_addr     = "https://secrets.cloud.northlake.dev"
+        cluster_addr = "http://127.0.0.1:8201"
+
+    volumes:
+      - ./data:/openbao/data
+
+    healthcheck:
+      # The listener is plain HTTP inside the container; Traefik terminates TLS.
+      # Exit status 2 means OpenBao is sealed but otherwise healthy.
+      test: ["CMD-SHELL", "BAO_ADDR=http://127.0.0.1:8200 bao status >/dev/null 2>&1; status=$$?; [ $$status -eq 0 ] || [ $$status -eq 2 ]"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - caddy-net
+
+networks:
+  caddy-net:
+    external: true
