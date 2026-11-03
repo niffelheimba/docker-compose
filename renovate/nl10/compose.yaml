@@ -11,9 +11,9 @@ services:
       TZ: America/New_York
       RENOVATE_CONFIG_FILE: /opt/renovate/config.js
       RENOVATE_BASE_DIR: /tmp/renovate
-      RENOVATE_PLATFORM: ${RENOVATE_PLATFORM:-github}
-      RENOVATE_ENDPOINT: ${RENOVATE_ENDPOINT:-https://api.github.com/}
-      RENOVATE_REPOSITORIES: ${RENOVATE_REPOSITORIES:-niffelheimba/docker-compose}
+      RENOVATE_PLATFORM: ${RENOVATE_PLATFORM:-forgejo}
+      RENOVATE_ENDPOINT: ${RENOVATE_ENDPOINT:-https://git.home.northlake.dev/api/v1/}
+      RENOVATE_REPOSITORIES: ${RENOVATE_REPOSITORIES:-nicholas/docker-compose}
       RENOVATE_INTERVAL_SECONDS: ${RENOVATE_INTERVAL_SECONDS:-3600}
       LOG_LEVEL: info
     volumes:
@@ -31,4 +31,4 @@ services:
 
 secrets:
   renovate_token:
-    file: ${RENOVATE_TOKEN_FILE:-/etc/renovate/github-token}
+    file: ${RENOVATE_TOKEN_FILE:-/etc/renovate/forgejo-token}

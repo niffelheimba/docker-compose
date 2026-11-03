@@ -1,51 +1,48 @@
 # Renovate on Ubuntu Internal (nl10 Multi)
 
-Pinned official Renovate CLI, run hourly in a single non-overlapping loop.
-No AI, Docker socket, published ports, automatic merge or deployment access.
-The current target is `niffelheimba/docker-compose` on GitHub. Arcane Git syncs
-remain on GitHub; this stack does not migrate repositories to Forgejo.
+The pinned official Renovate CLI runs hourly against the Forgejo pilot repository
+`nicholas/docker-compose`. It uses the dedicated restricted, nonadmin `renovate`
+account, with write collaboration on this repository only. Its credential has
+repository/issue write and user/organization read scopes; it is not a GitHub token.
 
-## Git sync
+There is no Docker socket, exposed port, automatic merge or deployment access.
+Root `renovate.json` limits processing to Compose, maintains digest pins, requires
+Dependency Dashboard approval before update PRs, and groups Kanidm replicas.
+Archived/stopped/unverified variants remain excluded. Approvals happen on
+Forgejo's Dependency Dashboard issue. Merging an update here does not deploy it.
 
-Use `renovate/nl10/compose.yaml`, project `renovate`, and sync the whole directory.
-`config.js` and `run.sh` must accompany the Compose file. Credentials live outside
-the synced project at `/etc/renovate/github-token`; `.env.example` has no secrets.
+## Deployment boundary
 
-## Credential handoff
+Arcane's existing Git syncs still point to GitHub and have not been migrated.
+The deployed Renovate project uses a local `.env` override for the Forgejo
+platform, API endpoint, repository and token-file location. This is separate
+from changing an Arcane Git sync's repository/source configuration. The Forgejo
+copy records the intended settings for a later deliberate source migration.
+No existing local Git checkout remotes have been repointed.
 
-An empty host token file is intentional at initial deployment: the container
-stays running and logs `WAITING FOR CREDENTIAL`, but does not run update jobs.
-Supply a dedicated GitHub bot credential later, restricted to the target repo
-with the permissions Renovate needs to read/write code, issues and pull requests.
-Keep the parent directory root-owned, mode 0700. The root-owned token file can
-be mode 0444 inside that protected directory, so the non-root container can read
-its bind-mounted Compose secret. Do not paste credentials into Compose or Git.
+After that later migration, source path is `renovate/nl10/compose.yaml`, project
+`renovate`, with whole-directory sync for `config.js` and `run.sh`. Never include
+host credentials in the Git sync. `RENOVATE_ENDPOINT` must end in `/api/v1/`.
 
-Write the token into the existing file (do not replace the inode), or recreate
-only this service after an atomic file replacement so its secret mount refreshes.
-The next hourly iteration will pick up an in-place update. An immediate check
-can be requested by restarting only the Renovate service. Validate a first run
-with `RENOVATE_DRY_RUN=full` before allowing normal PR creation.
+## Credential and verification
 
-The repository's root `renovate.json` limits processing to Compose, pins digests,
-requires dashboard approval before update PRs, disables automerge, and groups
-Kanidm replicas. Archived/stopped/unverified variants are excluded. An update
-PR does not itself deploy anything; merging can invoke existing Arcane syncs.
+The token is mounted read-only from `/etc/renovate/forgejo-token`. Keep its parent
+directory root-owned mode 0700; the root-owned token file may be mode 0444 inside
+that protected directory so the non-root container can read its secret mount.
+Keep generated bot recovery credentials in a separate root-only file. Never put
+tokens in Compose, repository configuration, chat, or a committed `.env`.
 
-## Later Forgejo migration
+Write token rotations into the existing file or recreate only this service after
+replacing the inode. An empty token causes an explicit waiting log, not an update
+check. Validate changes with an authenticated `RENOVATE_DRY_RUN=full` run before
+restarting the hourly worker for normal operation. Do not overlap manual runs
+with a scheduled check. Logs and exit status distinguish successful checks from
+the container merely being alive. GitHub API rate limits may affect optional
+upstream release/changelog lookup without a separate GitHub read credential.
 
-After copying the repository and creating a Forgejo bot credential, set
-`RENOVATE_PLATFORM=forgejo`, `RENOVATE_ENDPOINT=https://your-forgejo/api/v1/`,
-and `RENOVATE_REPOSITORIES=owner/repository`. Update the mounted credential,
-validate a dry run, and recreate this service. Root repository policies can move
-with the repository. Arcane sync URLs are a separate, deliberate migration.
+Stop this project to disable updates. Temporary clone/cache data is ephemeral;
+there is no application data volume to restore. The one-time copies of GitHub
+repositories are standalone Forgejo repositories, with no upstream sync/mirror.
 
-## Verification and recovery
-
-Check container logs for waiting, completed checks or errors; a running waiting
-container does not prove successful authentication. Stop this project to disable
-the updater. Its temporary clone/cache is ephemeral; there is no application
-data volume to restore. Keep the host token file out of backups published to Git.
-
-References: https://docs.renovatebot.com/getting-started/running/ and
-https://docs.renovatebot.com/modules/platform/forgejo/.
+References: https://docs.renovatebot.com/modules/platform/forgejo/ and
+https://docs.renovatebot.com/getting-started/running/.
