@@ -1,0 +1,34 @@
+name: renovate
+
+services:
+  renovate:
+    image: ghcr.io/renovatebot/renovate:44.206.2@sha256:d515a99f5d14d1c62b792ee61339d165dd9d20ee82ca9d5379daf639050bab51
+    container_name: renovate
+    init: true
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "/opt/renovate/run.sh"]
+    environment:
+      TZ: America/New_York
+      RENOVATE_CONFIG_FILE: /opt/renovate/config.js
+      RENOVATE_BASE_DIR: /tmp/renovate
+      RENOVATE_PLATFORM: ${RENOVATE_PLATFORM:-github}
+      RENOVATE_ENDPOINT: ${RENOVATE_ENDPOINT:-https://api.github.com/}
+      RENOVATE_REPOSITORIES: ${RENOVATE_REPOSITORIES:-niffelheimba/docker-compose}
+      RENOVATE_INTERVAL_SECONDS: ${RENOVATE_INTERVAL_SECONDS:-3600}
+      LOG_LEVEL: info
+    volumes:
+      - ./config.js:/opt/renovate/config.js:ro
+      - ./run.sh:/opt/renovate/run.sh:ro
+    secrets:
+      - source: renovate_token
+        target: renovate_token
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    stop_grace_period: 60s
+    mem_limit: 2g
+    cpus: 1.0
+
+secrets:
+  renovate_token:
+    file: ${RENOVATE_TOKEN_FILE:-/etc/renovate/github-token}

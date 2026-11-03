@@ -11,7 +11,8 @@ Deployable stacks are organized by application, then location. `nl00` is cloud;
 | Alloy | `alloy/nl00/`, `alloy/nl10/multi/`, `alloy/nl10/proxyauth/` |
 | Kanidm | `kanidm/nl00/`, `kanidm/nl10/` |
 | Traefik | `traefik/nl00/`, `traefik/nl10/` |
-| Forgejo starter | `forgejo/nl00/` (not deployed) |
+| Forgejo | `forgejo/nl10/` (Ubuntu Internal); `forgejo/nl00/` (undeployed starter) |
+| Renovate | `renovate/nl10/` (GitHub target; waits for dedicated credential) |
 | Arcane manager | `arcane/nl00/` |
 | Cloudflare DDNS, Frigate, Homelable, Karakeep, OAuth2 Proxy | each application’s `nl10/` directory |
 | Grafana and Loki stack | `observability/nl10/` |
@@ -48,7 +49,9 @@ artifact even when a publisher rebuilds a version tag.
 For Forgejo/Renovate, point the repository URL at its new remote and use its
 Docker Compose manager with digest updates. Keep both Kanidm replicas in the
 same version update and roll them out deliberately. Review major upgrades and
-migrations before deployment. No Renovate container or schedule is created here.
+migrations before deployment. The Renovate stack in `renovate/nl10/` runs hourly
+after its dedicated credential is supplied. Root `renovate.json` requires dashboard
+approval and disables automerge; GitHub remains the current source of truth.
 
 ## Arcane path migration
 

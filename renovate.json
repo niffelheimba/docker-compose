@@ -1,0 +1,24 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", "docker:pinDigests", "docker:enableMajor"],
+  "timezone": "America/New_York",
+  "enabledManagers": ["docker-compose"],
+  "dependencyDashboard": true,
+  "dependencyDashboardApproval": true,
+  "automerge": false,
+  "prConcurrentLimit": 3,
+  "prHourlyLimit": 2,
+  "ignorePaths": ["archive/**", "fluxer.gg/**", "parseable/**", "parseable (nl00)/**"],
+  "packageRules": [
+    {
+      "description": "Local application builds are maintained with their source",
+      "matchPackageNames": ["northlake/**"],
+      "enabled": false
+    },
+    {
+      "description": "Keep Kanidm replicas on the same reviewed image version",
+      "matchPackageNames": ["kanidm/server"],
+      "groupName": "Kanidm replicas"
+    }
+  ]
+}
