@@ -13,7 +13,7 @@ services:
       FORGEJO__server__DOMAIN: ${FORGEJO_DOMAIN:-git.home.northlake.dev}
       FORGEJO__server__ROOT_URL: ${FORGEJO_ROOT_URL:-https://git.home.northlake.dev/}
       FORGEJO__server__HTTP_PORT: "3000"
-      FORGEJO__server__SSH_DOMAIN: ${FORGEJO_SSH_DOMAIN:-10.10.60.200}
+      FORGEJO__server__SSH_DOMAIN: ${FORGEJO_SSH_DOMAIN:-git.home.northlake.dev}
       FORGEJO__server__SSH_PORT: ${FORGEJO_SSH_PORT:-2222}
       FORGEJO__server__SSH_LISTEN_PORT: "2222"
       FORGEJO__server__START_SSH_SERVER: "true"

@@ -15,3 +15,26 @@ http:
       loadBalancer:
         servers:
           - url: http://10.10.60.200:3030
+tcp:
+  routers:
+    forgejo-ssh:
+      entryPoints:
+        - forgejo-ssh
+      rule: HostSNI(`*`)
+      service: forgejo-ssh
+      middlewares:
+        - forgejo-ssh-private
+  services:
+    forgejo-ssh:
+      loadBalancer:
+        servers:
+          - address: 10.10.60.200:2222
+  middlewares:
+    forgejo-ssh-private:
+      ipAllowList:
+        sourceRange:
+          - 10.0.0.0/16
+          - 10.10.0.0/16
+          - 100.86.0.0/16
+          - 192.168.100.0/24
+          - 127.0.0.1/32
