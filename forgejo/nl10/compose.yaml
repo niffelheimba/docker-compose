@@ -10,16 +10,20 @@ services:
       TZ: America/New_York
       FORGEJO__database__DB_TYPE: sqlite3
       FORGEJO__database__PATH: /var/lib/gitea/data/forgejo.db
-      FORGEJO__server__DOMAIN: ${FORGEJO_DOMAIN:-10.10.60.200}
-      FORGEJO__server__ROOT_URL: ${FORGEJO_ROOT_URL:-http://10.10.60.200:3030/}
+      FORGEJO__server__DOMAIN: ${FORGEJO_DOMAIN:-git.home.northlake.dev}
+      FORGEJO__server__ROOT_URL: ${FORGEJO_ROOT_URL:-https://git.home.northlake.dev/}
       FORGEJO__server__HTTP_PORT: "3000"
-      FORGEJO__server__SSH_DOMAIN: ${FORGEJO_DOMAIN:-10.10.60.200}
+      FORGEJO__server__SSH_DOMAIN: ${FORGEJO_SSH_DOMAIN:-10.10.60.200}
       FORGEJO__server__SSH_PORT: ${FORGEJO_SSH_PORT:-2222}
       FORGEJO__server__SSH_LISTEN_PORT: "2222"
       FORGEJO__server__START_SSH_SERVER: "true"
       FORGEJO__service__DISABLE_REGISTRATION: "true"
       FORGEJO__service__REQUIRE_SIGNIN_VIEW: "true"
       FORGEJO__security__INSTALL_LOCK: "true"
+      FORGEJO__session__COOKIE_SECURE: "true"
+      FORGEJO__oauth2_client__ENABLE_AUTO_REGISTRATION: "true"
+      FORGEJO__oauth2_client__USERNAME: preferred_username
+      FORGEJO__oauth2_client__ACCOUNT_LINKING: login
     ports:
       - "${FORGEJO_BIND_IP:-10.10.60.200}:${FORGEJO_HTTP_PORT:-3030}:3000"
       - "${FORGEJO_BIND_IP:-10.10.60.200}:${FORGEJO_SSH_PORT:-2222}:2222"

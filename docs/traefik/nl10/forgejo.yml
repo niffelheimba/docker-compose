@@ -1,0 +1,17 @@
+http:
+  routers:
+    forgejo:
+      rule: Host(`git.home.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: forgejo
+      middlewares:
+        - northlake-errors@file
+        - private-net@file
+      tls:
+        certResolver: letsencrypt
+  services:
+    forgejo:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.200:3030

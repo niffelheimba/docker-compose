@@ -1,27 +1,52 @@
 # Forgejo on Ubuntu Internal (nl10 Multi)
 
 Pinned official rootless Forgejo 17.0.1 with SQLite and persistent named volume
-`forgejo_forgejo-data`. This is independent of the undeployed `nl00` starter.
-Arcane Git sync source: `forgejo/nl10/compose.yaml`, project `forgejo`.
+`forgejo_forgejo-data`. Arcane Git sync source: `forgejo/nl10/compose.yaml`,
+project `forgejo`. The `nl00` starter remains independent and undeployed.
 
-LAN web URL: `http://10.10.60.200:3030/`. Git SSH port: `2222` on the same IP.
-No cloud proxy network, public listener, DNS, TLS, OIDC, Git mirror or runner is
-created by this stack. Configure an HTTPS reverse proxy and matching root URL
-before using this as your regular Git endpoint over untrusted networks.
+## Access
 
-Installation is locked from the first start; public registration is disabled
-and anonymous repository browsing requires sign-in. Provision the first admin
-with Forgejo's `admin user create` command inside the running container. Keep
-the generated initial password outside Git and require a change at first login.
-The deployment session records the protected host credential-file location.
+Web URL: https://git.home.northlake.dev/ through NL10 Traefik, managed by the
+NL00 Traefik Manager. Route snapshot: `docs/traefik/nl10/forgejo.yml`.
+The route retains the existing private-network restriction and error pages.
+The backend remains `http://10.10.60.200:3030`; secure session cookies require
+using the HTTPS frontend. Git-over-SSH remains directly on `10.10.60.200:2222`
+via `FORGEJO_SSH_DOMAIN`, since the web hostname resolves to the proxy host.
 
-The data volume contains repositories, SQLite, configuration and keys. Preserve
-it across updates and take a consistent backup (stop Forgejo while backing up
-the whole volume for the simple SQLite method). Removing the container or Git
-sync does not remove the volume; never use `down -v` as an update procedure.
+## Kanidm
 
-Existing GitHub remotes and Arcane syncs stay unchanged. Clone/mirror repositories
-and deliberately migrate those integrations later. Image rollback after a
-database migration requires a compatible pre-upgrade data backup.
+Confidential client ID: `git`. Landing URL: `https://git.home.northlake.dev/`.
+Forgejo authentication source: `kanidm`, provider `openidConnect`.
+Discovery: `https://idm.northlake.dev/oauth2/openid/git/.well-known/openid-configuration`.
+Exact callback: `https://git.home.northlake.dev/user/oauth2/kanidm/callback`.
+PKCE and strict redirect matching remain enabled; legacy crypto is not enabled.
+Scopes: `openid email profile`. The custom array claim `git_roles` is required
+with value `user`; `admin` maps to Forgejo administrator. Kanidm scope/claim
+maps use `git_users` and `git_admins`, without exporting unrelated memberships.
 
-Reference: https://forgejo.org/docs/v17.0/admin/installation/docker/.
+Membership direction: `git_users` contains `northlake_users`; `git_admins`
+contains `northlake_admins`. Thus baseline users/admins inherit application
+roles. Existing individual members are preserved. Do not add the reverse
+relationships, which would grant broader baseline roles and risk cycles.
+
+The client secret lives only in Kanidm and Forgejo's persistent auth-source
+configuration; never put it in Compose, a synced `.env`, Git or documentation.
+Automatic OAuth account provisioning is enabled for authorized Kanidm users;
+manual public registration remains disabled. Existing-account linking requires
+local authentication (`ACCOUNT_LINKING=login`), never automatic email matching.
+The local initial administrator remains available as a recovery account.
+
+## Persistence and recovery
+
+Installation is locked. Initial local admin credential is stored privately on
+Ubuntu Internal at `/etc/forgejo/initial-admin.txt`; change it at first login.
+Back up repositories, SQLite, configuration and keys in the entire data volume
+consistently (stop Forgejo for the simple SQLite method). Preserve that volume
+across updates; never use `down -v` as an update procedure. Image rollback after
+a database migration needs a compatible pre-upgrade data backup.
+
+Existing GitHub remotes and Arcane syncs stay unchanged. Migrate repositories
+and those integrations deliberately later. No Forgejo Actions runner is added.
+
+References: https://forgejo.org/docs/v17.0/admin/installation/docker/ and
+https://kanidm.github.io/kanidm/stable/accounts/groups.html.
