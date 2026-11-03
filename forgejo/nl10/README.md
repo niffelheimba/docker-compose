@@ -10,8 +10,10 @@ Web URL: https://git.home.northlake.dev/ through NL10 Traefik, managed by the
 NL00 Traefik Manager. Route snapshot: `docs/traefik/nl10/forgejo.yml`.
 The route retains the existing private-network restriction and error pages.
 The backend remains `http://10.10.60.200:3030`; secure session cookies require
-using the HTTPS frontend. Git-over-SSH remains directly on `10.10.60.200:2222`
-via `FORGEJO_SSH_DOMAIN`, since the web hostname resolves to the proxy host.
+using the HTTPS frontend. Git-over-SSH uses `git.home.northlake.dev:2222` via the same proxy.
+Traefik forwards raw TCP to `10.10.60.200:2222`, preserving Forgejo SSH host keys.
+The private-interface listener and TCP allowlist match the web access boundary.
+Example: `ssh://git@git.home.northlake.dev:2222/nicholas/docker-compose.git`.
 
 ## Kanidm
 
