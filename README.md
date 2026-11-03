@@ -11,6 +11,7 @@ Deployable stacks are organized by application, then location. `nl00` is cloud;
 | Alloy | `alloy/nl00/`, `alloy/nl10/multi/`, `alloy/nl10/proxyauth/` |
 | Kanidm | `kanidm/nl00/`, `kanidm/nl10/` |
 | Traefik | `traefik/nl00/`, `traefik/nl10/` |
+| VaulTLS | `vaultls/nl10/` (Ubuntu Internal; mtls.home.northlake.dev) |
 | Forgejo | `forgejo/nl10/` (Ubuntu Internal); `forgejo/nl00/` (undeployed starter) |
 | Renovate | `renovate/nl10/` (GitHub target; waits for dedicated credential) |
 | Arcane manager | `arcane/nl00/` |
