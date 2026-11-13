@@ -1,0 +1,16 @@
+[Unit]
+Description=Frigate NAS ownership mapping for rootless Docker
+RequiresMountsFor=/mnt/Frigate
+After=remote-fs.target
+Before=user@1000.service
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/test -f /mnt/Frigate/.nas-ready
+ExecStart=/usr/bin/bindfs -f -o allow_other --map=0/1000:@0/@1000 --chown-ignore --chgrp-ignore /mnt/Frigate /mnt/Frigate-rootless
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target
