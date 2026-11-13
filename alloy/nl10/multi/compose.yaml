@@ -19,6 +19,7 @@ services:
       - ./config/config.alloy:/etc/alloy/config.alloy:ro
       - alloy-data:/var/lib/alloy/data
       - ${DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock:ro
+      - ${ROOTFUL_DOCKER_SOCKET:-/var/lib/northlake-docker-readonly/docker.sock}:/var/run/docker-rootful.sock:ro
       - /var/log/journal:/var/log/journal:ro
       - /run/log/journal:/run/log/journal:ro
       - /etc/machine-id:/etc/machine-id:ro
