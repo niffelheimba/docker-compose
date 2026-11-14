@@ -10,6 +10,18 @@ http:
         - private-net@file
       tls:
         certResolver: letsencrypt
+    # Docker hairpin requests arrive from the Traefik bridge gateway.
+    # Permit authenticated Git reads of Compose only; keep the web UI private.
+    forgejo-arcane-git-read:
+      rule: Host(`git.home.northlake.dev`) && ClientIP(`172.30.0.1/32`) && (Path(`/nicholas/docker-compose.git/info/refs`) || Path(`/nicholas/docker-compose.git/git-upload-pack`)) && (Method(`GET`) || Method(`POST`))
+      priority: 100
+      entryPoints:
+        - websecure
+      service: forgejo
+      middlewares:
+        - northlake-errors@file
+      tls:
+        certResolver: letsencrypt
   services:
     forgejo:
       loadBalancer:
