@@ -1,0 +1,36 @@
+name: vaultls
+
+services:
+  vaultls:
+    image: ghcr.io/7ritn/vaultls:v1.4.1@sha256:fc8ea1491626974973678294ef964c47aafaa22a67e20e1f1c6b88725f3a99f7
+    container_name: vaultls
+    restart: unless-stopped
+    environment:
+      TZ: America/New_York
+      VAULTLS_URL: https://mtls.home.northlake.dev/
+      VAULTLS_API_SECRET: /run/secrets/VAULTLS_API_SECRET
+      VAULTLS_LOG_LEVEL: info
+    ports:
+      - "${VAULTLS_BIND_IP:-10.10.60.200}:${VAULTLS_HTTP_PORT:-5173}:80"
+    volumes:
+      - vaultls-data:/app/data
+    secrets:
+      - source: vaultls_api_secret
+        target: VAULTLS_API_SECRET
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - NET_RAW
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://127.0.0.1/api/server/version"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  vaultls-data:
+
+secrets:
+  vaultls_api_secret:
+    file: ${VAULTLS_API_SECRET_FILE:-/etc/vaultls/api-secret}

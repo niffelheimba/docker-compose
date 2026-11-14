@@ -3,7 +3,7 @@ name: frigate
 services:
   frigate:
     container_name: frigate
-    privileged: true
+    privileged: false
     restart: unless-stopped
     stop_grace_period: 30s
     image: ghcr.io/blakeblackshear/frigate:0.18.1@sha256:ae4ee2505e4dba6313b02bf5e8eea6c35fb1119f7087b9f684082be0a9fa0a71
@@ -20,7 +20,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/Frigate/config:/config
-      - /mnt/Frigate:/media/frigate
+      - ${FRIGATE_MEDIA_PATH:-/mnt/Frigate-rootless}:/media/frigate
       - type: tmpfs
         target: /tmp/cache
         tmpfs:
@@ -39,10 +39,3 @@ services:
 
 #    env_file:
 #      - stack.env
-volumes:
-  frigate:
-    driver: local
-    driver_opts:
-        type: "nfs4"
-        o: "addr=10.10.60.250,nolock,hard,rw"
-        device: ":/mnt/NAS1/NFS/Frigate"
