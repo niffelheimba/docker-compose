@@ -53,7 +53,9 @@ same version update and roll them out deliberately. Review major upgrades and
 migrations before deployment. The Renovate stack in `renovate/nl10/` runs hourly
 with its dedicated Forgejo bot credential. Root `renovate.json` creates patch/minor
 and digest update PRs automatically, requires dashboard approval for major updates,
-and disables automerge. It allows up to 5 open PRs and 2 new PRs per hour. Arcane
+and disables automerge. PR and branch creation have no hourly or concurrency caps.
+Updates are grouped by Compose file, with major upgrades kept separate for approval.
+Kanidm server replicas remain a shared group across both sites. Arcane
 deployment syncs remain on GitHub; this standalone Forgejo copy is Renovate's update
 target. No upstream sync is configured.
 

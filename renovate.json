@@ -1,27 +1,74 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", "docker:pinDigests", "docker:enableMajor"],
+  "extends": [
+    "config:recommended",
+    "docker:pinDigests",
+    "docker:enableMajor"
+  ],
   "timezone": "America/New_York",
-  "enabledManagers": ["docker-compose"],
+  "enabledManagers": [
+    "docker-compose"
+  ],
   "dependencyDashboard": true,
   "dependencyDashboardApproval": false,
   "major": {
     "dependencyDashboardApproval": true
   },
   "automerge": false,
-  "prConcurrentLimit": 5,
-  "prHourlyLimit": 2,
-  "ignorePaths": ["archive/**", "fluxer.gg/**", "parseable/**", "parseable (nl00)/**"],
+  "prConcurrentLimit": 0,
+  "prHourlyLimit": 0,
+  "ignorePaths": [
+    "archive/**",
+    "fluxer.gg/**",
+    "parseable/**",
+    "parseable (nl00)/**"
+  ],
   "packageRules": [
     {
       "description": "Local application builds are maintained with their source",
-      "matchPackageNames": ["northlake/**"],
+      "matchPackageNames": [
+        "northlake/**"
+      ],
       "enabled": false
     },
     {
+      "description": "Group routine container updates by Compose file",
+      "matchManagers": [
+        "docker-compose"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+        "pin",
+        "pinDigest",
+        "rollback",
+        "bump"
+      ],
+      "groupName": "{{packageFile}}",
+      "groupSingleUpdates": true
+    },
+    {
+      "description": "Keep major stack upgrades separate and require dashboard approval",
+      "matchManagers": [
+        "docker-compose"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "groupName": "{{packageFile}} major updates",
+      "groupSingleUpdates": true,
+      "dependencyDashboardApproval": true
+    },
+    {
       "description": "Keep Kanidm replicas on the same reviewed image version",
-      "matchPackageNames": ["kanidm/server"],
-      "groupName": "Kanidm replicas"
+      "matchPackageNames": [
+        "kanidm/server",
+        "docker.io/kanidm/server"
+      ],
+      "groupName": "Kanidm replicas",
+      "groupSingleUpdates": true
     }
-  ]
+  ],
+  "branchConcurrentLimit": 0
 }
