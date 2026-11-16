@@ -3,7 +3,7 @@ name: semaphore
 services:
   mysql:
     restart: unless-stopped
-    image: mysql:8.0.46@sha256:7dcddc01f13bab2f15cde676d44d01f61fc9f99fe7785e86196dfc07d358ae2b
+    image: mysql:8.4.13@sha256:a81d043930e51745522bd5c430961cf8286f0a23f0a9a2a6e0108f7ea71b0902
     hostname: mysql
     volumes:
       - semaphore-mysql:/var/lib/mysql
@@ -15,7 +15,7 @@ services:
 
   semaphore:
     restart: unless-stopped
-    image: semaphoreui/semaphore:v2.19.17@sha256:008dacd9f1adbd92e8a048f1786ae1dd9bed2a352aca2eb30b9837de5706e7f7
+    image: semaphoreui/semaphore:v2.20.24@sha256:c547d31cba238bee4a9f2b5eec9d0f42b2d5ecb399377a2e63008500d74fbf3a
     env_file:
       - .env
     depends_on:
