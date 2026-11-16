@@ -4,9 +4,12 @@
   "timezone": "America/New_York",
   "enabledManagers": ["docker-compose"],
   "dependencyDashboard": true,
-  "dependencyDashboardApproval": true,
+  "dependencyDashboardApproval": false,
+  "major": {
+    "dependencyDashboardApproval": true
+  },
   "automerge": false,
-  "prConcurrentLimit": 3,
+  "prConcurrentLimit": 5,
   "prHourlyLimit": 2,
   "ignorePaths": ["archive/**", "fluxer.gg/**", "parseable/**", "parseable (nl00)/**"],
   "packageRules": [

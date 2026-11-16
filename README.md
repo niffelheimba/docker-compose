@@ -13,7 +13,7 @@ Deployable stacks are organized by application, then location. `nl00` is cloud;
 | Traefik | `traefik/nl00/`, `traefik/nl10/` |
 | VaulTLS | `vaultls/nl10/` (Ubuntu Internal; mtls.home.northlake.dev) |
 | Forgejo | `forgejo/nl10/` (Ubuntu Internal); `forgejo/nl00/` (undeployed starter) |
-| Renovate | `renovate/nl10/` (Forgejo pilot; dashboard approval required) |
+| Renovate | `renovate/nl10/` (Forgejo pilot; major updates need approval) |
 | Arcane manager | `arcane/nl00/` |
 | Cloudflare DDNS, Frigate, Homelable, Karakeep, OAuth2 Proxy | each application’s `nl10/` directory |
 | Grafana and Loki stack | `observability/nl10/` |
@@ -51,9 +51,11 @@ For Forgejo/Renovate, point the repository URL at its new remote and use its
 Docker Compose manager with digest updates. Keep both Kanidm replicas in the
 same version update and roll them out deliberately. Review major upgrades and
 migrations before deployment. The Renovate stack in `renovate/nl10/` runs hourly
-with its dedicated Forgejo bot credential. Root `renovate.json` requires dashboard
-approval and disables automerge. Arcane deployment syncs remain on GitHub; this
-standalone Forgejo copy is Renovate's update target. No upstream sync is configured.
+with its dedicated Forgejo bot credential. Root `renovate.json` creates patch/minor
+and digest update PRs automatically, requires dashboard approval for major updates,
+and disables automerge. It allows up to 5 open PRs and 2 new PRs per hour. Arcane
+deployment syncs remain on GitHub; this standalone Forgejo copy is Renovate's update
+target. No upstream sync is configured.
 
 ## Arcane path migration
 

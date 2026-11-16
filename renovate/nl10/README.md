@@ -6,8 +6,10 @@ account, with write collaboration on this repository only. Its credential has
 repository/issue write and user/organization read scopes; it is not a GitHub token.
 
 There is no Docker socket, exposed port, automatic merge or deployment access.
-Root `renovate.json` limits processing to Compose, maintains digest pins, requires
-Dependency Dashboard approval before update PRs, and groups Kanidm replicas.
+Root `renovate.json` limits processing to Compose, maintains digest pins, creates
+patch/minor and digest update PRs automatically, and requires Dependency Dashboard
+approval before major update PRs. It allows up to 5 open PRs and 2 new PRs per hour,
+disables automerge, and groups Kanidm replicas.
 Archived/stopped/unverified variants remain excluded. Approvals happen on
 Forgejo's Dependency Dashboard issue. Merging an update here does not deploy it.
 
