@@ -2,7 +2,7 @@ name: renovate
 
 services:
   renovate:
-    image: ghcr.io/renovatebot/renovate:44.206.2@sha256:d515a99f5d14d1c62b792ee61339d165dd9d20ee82ca9d5379daf639050bab51
+    image: ghcr.io/renovatebot/renovate:44.241.0@sha256:7397a1b4893806ca4f25b175236932e2496bca52e9230668ac79ea0ef3868e5f
     container_name: renovate
     init: true
     restart: unless-stopped
