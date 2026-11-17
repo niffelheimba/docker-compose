@@ -70,6 +70,31 @@
       ],
       "groupName": "Kanidm replicas",
       "groupSingleUpdates": true
+    },
+    {
+      "description": "Keep Semaphore on MySQL 8.4 LTS; later series need a planned database migration",
+      "matchFileNames": [
+        "semaphore/nl00/compose.yaml"
+      ],
+      "matchPackageNames": [
+        "mysql"
+      ],
+      "allowedVersions": "/^8\\.4\\./"
+    },
+    {
+      "description": "Meilisearch minor and major updates require a backed-up database migration",
+      "matchFileNames": [
+        "karakeep/nl10/docker-compose.yaml"
+      ],
+      "matchPackageNames": [
+        "getmeili/meilisearch"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "major"
+      ],
+      "groupName": "{{packageFile}} search database migration",
+      "dependencyDashboardApproval": true
     }
   ],
   "branchConcurrentLimit": 0
