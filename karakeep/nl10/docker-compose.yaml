@@ -2,7 +2,7 @@ name: karakeep
 
 services:
   web:
-    image: ghcr.io/karakeep-app/karakeep:latest@sha256:170bac0af0edba232b491f214eae50cf084e1bb465463922b0f8053dd4615226
+    image: ghcr.io/karakeep-app/karakeep:latest@sha256:ddef481948e398ba462e0266d59ef2c2b097dc66d987e90363d35d4964e78c8f
     restart: unless-stopped
     volumes:
       # By default, the data is stored in a docker volume called "data".
@@ -32,7 +32,7 @@ services:
       - --remote-debugging-port=9222
       - --hide-scrollbars
   meilisearch:
-    image: getmeili/meilisearch:v1.13.3@sha256:bed3fb650e62da53145777204891159242f6ea4ce69e215b36223af4aa64a0ae
+    image: getmeili/meilisearch:v1.57.0@sha256:91bf09897482c17205c8faeca8daa8d57999fb9de20d862763cdfa92ba4ec790
     restart: unless-stopped
     env_file:
       - .env
