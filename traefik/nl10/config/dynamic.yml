@@ -24,6 +24,7 @@ http:
         - websecure
       service: frigate
       middlewares:
+        - frigate-forwarded-host
         - frigate-oauth-errors
         - frigate-oauth-auth
         - frigate-proxy-secret
@@ -222,6 +223,10 @@ http:
           - 127.0.0.1/32
           - 172.30.0.1/32
 
+    frigate-forwarded-host:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Host: frigate.home.northlake.dev
     frigate-oauth-auth:
       forwardAuth:
         address: http://frigate-oauth2-proxy:4180/oauth2/auth

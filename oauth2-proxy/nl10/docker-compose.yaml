@@ -7,6 +7,12 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    environment:
+      OAUTH2_PROXY_HTPASSWD_FILE: /etc/oauth2-proxy/ha.htpasswd
+      OAUTH2_PROXY_HTPASSWD_USER_GROUPS: frigate_admins@idm.northlake.dev
+      OAUTH2_PROXY_DISPLAY_HTPASSWD_FORM: "false"
+    volumes:
+      - /home/service/docker-state/oauth2-proxy-ha/ha.htpasswd:/etc/oauth2-proxy/ha.htpasswd:ro
     networks:
       - default
       - traefik-net
