@@ -82,19 +82,27 @@
       "allowedVersions": "/^8\\.4\\./"
     },
     {
-      "description": "Meilisearch minor and major updates require a backed-up database migration",
+      "description": "Separate database and persistent backend updates from application groups; review compatibility and migration before creating any PR",
+      "matchManagers": [
+        "docker-compose"
+      ],
+      "matchPackageNames": [
+        "/(^|/)(mysql|mariadb|postgres|postgresql|redis|valkey|mongo|mongodb|meilisearch|clickhouse-server|influxdb|elasticsearch|opensearch|qdrant|dragonfly|openbao|loki)$/"
+      ],
+      "groupName": "{{packageFile}} database review {{depName}}",
+      "groupSingleUpdates": true,
+      "dependencyDashboardApproval": true,
+      "automerge": false
+    },
+    {
+      "description": "Keep Karakeep search on its migrated Meilisearch 1.57 data format; later minors require a planned migration",
       "matchFileNames": [
         "karakeep/nl10/docker-compose.yaml"
       ],
       "matchPackageNames": [
         "getmeili/meilisearch"
       ],
-      "matchUpdateTypes": [
-        "minor",
-        "major"
-      ],
-      "groupName": "{{packageFile}} search database migration",
-      "dependencyDashboardApproval": true
+      "allowedVersions": "/^1\\.57\\./"
     }
   ],
   "branchConcurrentLimit": 0

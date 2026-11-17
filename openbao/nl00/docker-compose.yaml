@@ -2,8 +2,7 @@ name: openbao
 
 services:
   openbao:
-    # v2.7 removed the legacy file storage backend used by this deployment.
-    # Keep this on the maintained 2.6 release line until the data is migrated.
+    # Encrypted data migrated from the removed file backend to Raft.
     image: docker.io/openbao/openbao:2.7.2@sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f
     container_name: openbao
     restart: unless-stopped
@@ -20,8 +19,9 @@ services:
       BAO_LOCAL_CONFIG: |
         ui = true
 
-        storage "file" {
+        storage "raft" {
           path = "/openbao/data"
+          node_id = "openbao-oci1"
         }
 
         listener "tcp" {
@@ -33,7 +33,7 @@ services:
         cluster_addr = "http://127.0.0.1:8201"
 
     volumes:
-      - ./data:/openbao/data
+      - ./raft-data:/openbao/data
 
     healthcheck:
       # The listener is plain HTTP inside the container; Traefik terminates TLS.
