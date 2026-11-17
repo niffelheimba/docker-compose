@@ -2,7 +2,7 @@ name: traefik
 
 services:
   traefik:
-    image: traefik:v3.7.1@sha256:6b9cbca6fac42ab0075f5437d8dc1685cfd188626d8d515839ea94f8b6271c42
+    image: traefik:v3.7.19@sha256:aa942a00bce033c909bf1f7e861d93761be4b31a035f10d2410d33e38a8f41cf
     container_name: traefik
     restart: unless-stopped
     env_file:
@@ -73,7 +73,7 @@ services:
   traefik-manager:
     # Upstream currently publishes the ARM64-compatible Docker image as latest;
     # the v1.15.0 tag is not available to OCI VM1's Docker engine.
-    image: ghcr.io/chr0nzz/traefik-manager:1.15.4@sha256:db016c04be30b76afbf259c5ca4c3667d861805404bc2d572f9ad326e5bf96c1
+    image: ghcr.io/chr0nzz/traefik-manager:1.15.7@sha256:b98b1e983eb72fac4c467803bcad76579971119463b878365049625051f198e7
     container_name: traefik-manager
     restart: unless-stopped
     environment:
