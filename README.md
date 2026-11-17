@@ -55,9 +55,29 @@ with its dedicated Forgejo bot credential. Root `renovate.json` creates patch/mi
 and digest update PRs automatically, requires dashboard approval for major updates,
 and disables automerge. PR and branch creation have no hourly or concurrency caps.
 Updates are grouped by Compose file, with major upgrades kept separate for approval.
-Kanidm server replicas remain a shared group across both sites. Arcane
-deployment syncs remain on GitHub; this standalone Forgejo copy is Renovate's update
-target. No upstream sync is configured.
+Kanidm server replicas remain a shared group across both sites.
+
+Database images and persistent backends (including OpenBao and Loki) use separate
+`database review` groups per Compose file and dependency. Every update in these
+groups waits for dashboard approval, including patch and digest updates. They do
+not ride along with an application PR. Approval only opens a PR; it does not prove
+application compatibility or perform a database migration.
+
+Semaphore MySQL stays on 8.4.x LTS. Karakeep Meilisearch stays on its migrated
+1.57.x data format. Moving beyond these lines requires an explicit configuration
+change, compatibility review, backup and migration plan. Before adding another
+database image, check that its package name matches the database rule in
+`renovate.json`; names alone cannot establish an application's supported versions.
+
+The desktop bulk merger v1.4 excludes database-review PRs by default. After review,
+select them explicitly with `-PrNumbers` and `-AllowDatabase`; `-AllowMajor` alone
+does not include database PRs and `-MergeAll` cannot be combined with `-AllowDatabase`.
+
+Enabled Arcane Git syncs track this Forgejo repository's `main` every five minutes.
+In the installed Arcane 3.0.1, changed Compose files can redeploy running stacks
+even when the explicit image-pull/redeploy flags are disabled. Review and merge
+with deployment in mind; verify completed deployment jobs and application health.
+There is no automatic merge policy.
 
 ## Arcane path migration
 
@@ -72,10 +92,18 @@ Configured GitOps source paths move to:
 | Traefik | `traefik/nl00/compose.yaml` |
 | Alloy (cloud manager) | `alloy/nl00/compose.yaml` |
 
-The existing runtime project destinations and secrets stay in place. The
-inspected GitOps definitions have automatic redeployment and image pulling
-disabled. Other manually managed projects should select their corresponding
-new source path when next imported or migrated.
+The existing runtime project destinations and secrets stay in place. The explicit
+GitOps image-pull/redeploy flags are disabled, but changed-file deployment behavior
+still applies as described above. Other manually managed projects should select
+their corresponding source path when next imported or migrated.
+
+OpenBao uses Raft storage in the runtime `./raft-data` bind directory. The original
+legacy `./data` directory is retained for recovery and is not the active backend.
+Raft migration preserves the existing vault and unseal keys. Following a restart,
+unseal through the existing UI with the required two of three keys; never initialize
+a replacement vault to work around a sealed status. Restoring old file storage
+requires a compatible pre-2.7 engine and the preserved source/backup; it is not a
+supported backend for the configured 2.7 image.
 
 ## Rootless Docker on nl00
 
