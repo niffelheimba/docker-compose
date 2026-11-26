@@ -2,7 +2,7 @@ name: homelable
 
 services:
   backend:
-    image: ghcr.io/pouzor/homelable-backend:latest@sha256:618ee16e76f7cf1fe9aee5751966a042f7c58416defd9943b119a0a3c7c00c0d
+    image: ghcr.io/pouzor/homelable-backend:latest@sha256:f4f8b8061af27084c793803614e0009f3440fbbf7cc12033438868a86452d60a
     restart: unless-stopped
     env_file:
       - .env
@@ -22,7 +22,7 @@ services:
       - homelable
 
   frontend:
-    image: ghcr.io/pouzor/homelable-frontend:latest@sha256:4e20973b35e2d0f7d58bb40369c84d72751f1f5c154b202c3ec8b2c5d4632a3a
+    image: ghcr.io/pouzor/homelable-frontend:latest@sha256:629a18054f13b54e9c6dfbab059aca27bbf4bcc083a8366d43706d59aa5c6520
     restart: unless-stopped
     ports:
       - "${HOMELABLE_BIND_IP:-0.0.0.0}:${HOMELABLE_PORT:-3010}:80"
