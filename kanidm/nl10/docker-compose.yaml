@@ -2,7 +2,7 @@ name: kanidm
 
 services:
   certdumper:
-    image: ghcr.io/kereis/traefik-certs-dumper:1.8.33@sha256:f5b94de8a15b71deafe7d989412d2755d8ab967cfc8be0ce44e87c201a3ed815
+    image: ghcr.io/kereis/traefik-certs-dumper:1.8.34@sha256:43ef6d16182cbbfb4f3317b7eb6aeaa52a54f1bdcd8c9c641406e3de686c63de
     container_name: kanidm-home-certdumper
     command: --restart-containers kanidm-home
     restart: unless-stopped
