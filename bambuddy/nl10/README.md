@@ -28,6 +28,7 @@ No Traefik restart is needed.
 Confidential client: `bambuddy`; landing URL as above; strict exact redirect:
 `https://bambuddy.home.northlake.dev/api/v1/auth/oidc/callback`.
 Issuer: `https://idm.northlake.dev/oauth2/openid/bambuddy`.
+`APP_URL` is set to the public HTTPS origin so the generated callback matches.
 Keep PKCE and ES256 enabled. Request `openid email profile`; require verified
 email, automatically provision users, and disable automatic account linking.
 The `groups` claim maps `bambuddy_admins` (Nicholas) to Bambuddy's
