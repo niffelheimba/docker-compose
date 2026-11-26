@@ -18,7 +18,8 @@ Docker administrators can inspect container environment values.
 Initialize authentication while the HTTP bind is loopback-only by setting
 `BAMBUDDY_BIND_IP=127.0.0.1` in the new sync's non-secret environment override.
 Use `/api/v1/auth/setup` to enable authentication and create a random local
-recovery administrator; save that password only in the private host directory.
+recovery administrator. Hand the temporary password directly to the owner for
+replacement; do not save a recovery-password file on the host.
 Then change the override to `10.10.60.200` and redeploy this project. Install
 `docs/traefik/nl10/bambuddy.yml` into ProxyAuth's watched dynamic directory.
 No Traefik restart is needed.
@@ -83,7 +84,7 @@ redirect alone does not prove that login completed.
 
 To withdraw this new service, disable its Arcane sync, stop only the Bambuddy
 project, and remove only its Traefik router file. Retain the data volumes and
-host-only recovery credentials. Revert the deployment commit if source rollback
+host-only OIDC secret. Revert the deployment commit if source rollback
 is needed; do not remove volumes or unrelated projects.
 
 Verified upstream references (2026-11-26):
