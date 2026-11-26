@@ -1,0 +1,17 @@
+http:
+  routers:
+    bambuddy:
+      rule: Host(`bambuddy.home.northlake.dev`)
+      entryPoints:
+        - websecure
+      service: bambuddy
+      middlewares:
+        - northlake-errors@file
+        - private-net@file
+      tls:
+        certResolver: letsencrypt
+  services:
+    bambuddy:
+      loadBalancer:
+        servers:
+          - url: http://10.10.60.200:8000

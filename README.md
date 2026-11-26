@@ -15,6 +15,7 @@ Deployable stacks are organized by application, then location. `nl00` is cloud;
 | Forgejo | `forgejo/nl10/` (Ubuntu Internal); `forgejo/nl00/` (undeployed starter) |
 | Renovate | `renovate/nl10/` (Forgejo pilot; major updates need approval) |
 | Arcane manager | `arcane/nl00/` |
+| Bambuddy | `bambuddy/nl10/` (Ubuntu Internal; bambuddy.home.northlake.dev) |
 | Cloudflare DDNS, Frigate, Homelable, Karakeep, OAuth2 Proxy | each application’s `nl10/` directory |
 | Grafana and Loki stack | `observability/nl10/` |
 | OpenBao, Semaphore, Uptime Kuma, Vaultwarden | each application’s `nl00/` directory |
