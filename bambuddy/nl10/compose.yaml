@@ -43,7 +43,7 @@ services:
   # Optional server-side slicing. Enable the slicer profile explicitly in Arcane.
   # No published port: only Bambuddy can reach this API on the project network.
   orca-slicer-api:
-    image: ghcr.io/maziggy/orca-slicer-api:latest
+    image: ghcr.io/maziggy/orca-slicer-api:latest@sha256:e42c1522e7f00a24400346a3342483ada265528808168c3fdc11473c9b212515
     profiles: [slicer]
     restart: unless-stopped
     environment:
