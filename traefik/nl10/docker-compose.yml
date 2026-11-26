@@ -2,7 +2,7 @@ name: nl10-traefik
 
 services:
   traefik:
-    image: traefik:v3.7.19@sha256:aa942a00bce033c909bf1f7e861d93761be4b31a035f10d2410d33e38a8f41cf
+    image: traefik:v3.8.0@sha256:00c9734983e74ae35a1fc18eaee9e9da13f3dde95c4e45b3b8c3b60e0dbd2d17
     container_name: traefik
     restart: unless-stopped
     env_file:
@@ -66,7 +66,7 @@ services:
 
   traefik-manager-agent:
     # Upstream currently publishes the ARM64-compatible Docker image as latest.
-    image: ghcr.io/chr0nzz/traefik-manager-agent:1.15.7@sha256:9e33cde3babd926d37d3b526401586d42cfcff3bc83147833351897611c79777
+    image: ghcr.io/chr0nzz/traefik-manager-agent:1.15.9@sha256:594bb211d18d12663953420c1607f34ede0526e42915f90fc589fcfbab535099
     container_name: traefik-manager-agent
     restart: unless-stopped
     environment:
