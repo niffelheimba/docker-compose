@@ -24,7 +24,7 @@ services:
       BAMBUDDY_OIDC_GROUP_MAPPING: '{"bambuddy_admins":"Administrators","northlake_family_users":"Operators"}'
       SLICER_API_URL: http://orca-slicer-api:3000
     env_file:
-      - /home/service/docker-secrets/bambuddy/oidc.env
+      - /home/service/docker-compose/.secrets/bambuddy/oidc.env
     ports:
       - "${BAMBUDDY_BIND_IP:-10.10.60.200}:${BAMBUDDY_HTTP_PORT:-8000}:8000"
     volumes:

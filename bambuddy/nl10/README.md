@@ -9,7 +9,7 @@ Arcane Git Sync uses the existing Forgejo repository, branch `main`, source
 `bambuddy/nl10/compose.yaml`, directory sync enabled, deploy mode, five-minute
 automatic sync. Only this new project should be deployed.
 
-The required host-only file `/home/service/docker-secrets/bambuddy/oidc.env`
+The required host-only file `/home/service/docker-compose/.secrets/bambuddy/oidc.env`
 contains `BAMBUDDY_OIDC_CLIENT_SECRET`. Keep its directory mode 0700 and file
 mode 0600, owned by service. It is outside the Git checkout and synced project.
 Never place secrets in Arcane's source repository, `.env.example`, or this file.
