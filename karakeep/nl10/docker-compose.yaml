@@ -2,7 +2,7 @@ name: karakeep
 
 services:
   web:
-    image: ghcr.io/karakeep-app/karakeep:latest@sha256:ddef481948e398ba462e0266d59ef2c2b097dc66d987e90363d35d4964e78c8f
+    image: ghcr.io/karakeep-app/karakeep:latest@sha256:6b266bd3b245f31d31534270d08121b51d1698b7ee4cd8e5ee891f6b46a50ec6
     restart: unless-stopped
     volumes:
       # By default, the data is stored in a docker volume called "data".
